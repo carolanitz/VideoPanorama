@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(Matcher)
 
-find_package(OpenCV REQUIRED)
 
 add_definitions(-std=c++11)
 
@@ -14,4 +13,10 @@ set(SOURCES
 
 add_executable(matcher ${SOURCES})
 
+find_package(OpenCV REQUIRED)
 target_link_libraries(matcher ${OpenCV_LIBS})
+
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS})
+target_link_libraries(matcher ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})

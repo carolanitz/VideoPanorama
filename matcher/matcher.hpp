@@ -5,6 +5,8 @@
 
 #include <opencv2/core/core.hpp>
 
+#include "painter.hpp"
+
 class Matcher {
 
 public:
@@ -12,13 +14,16 @@ public:
   ~Matcher();
 
   // Set new images
-  void updateImage1(cv::Mat image, std::array<float, 4> gyro);
-  void updateImage2(cv::Mat image, std::array<float, 4> gyro);
+  void updateImage1(cv::Mat image, cv::Vec4f gyro);
+  void updateImage2(cv::Mat image, cv::Vec4f gyro);
 
   // Set OpenGL images
   void setupOpenGL(int width, int height);
   void draw();
   void cleanupOpenGL();
+
+private:
+  Painter painter;
 };
 
 
