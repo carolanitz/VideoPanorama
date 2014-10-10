@@ -6,38 +6,6 @@
 cv::VideoCapture video0, video1;
 Matcher matcher;
 
-/*
-
-int main(int argc, char** argv)
-{
-
-
-  Matcher matcher;
-
-  while(true) {
-    //grab and retrieve each frames of the video sequentially
-    cv::Mat3b frame0;
-    video0 >> frame0;
-    cv::Mat3b frame1;
-    video1 >> frame1;
-
-    matcher.updateImage1(frame0, {0, 0, 0, 0});
-    matcher.updateImage2(frame1, {0, 0, 0, 0});
-
-    cv::imshow("frame0", frame0);
-    cv::imshow("frame1", frame1);
-
-    // wait for 100 milliseconds
-    int c = cvWaitKey(100);
-
-    // exit the loop if user press "Esc" key  (ASCII value of "Esc" is 27)
-    if(27 == char(c)) break;
-  }
-
-  return 0;
-}
-*/
-
 int refreshMillis = 80;      // Refresh period in milliseconds
 
 /* Handler for window-repaint event. Call back when the window first appears and
