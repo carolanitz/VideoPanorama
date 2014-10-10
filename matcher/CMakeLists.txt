@@ -8,7 +8,9 @@ add_definitions(-std=c++11)
 set(SOURCES
   main.cpp
   matcher.hpp
-  matcher.cpp)
+  matcher.cpp
+  painter.hpp
+  painter.cpp)
 
 add_executable(matcher ${SOURCES})
 
