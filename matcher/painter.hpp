@@ -2,6 +2,7 @@
 #define VIDEO_PANORAMA_MATCHER_PAINTER_HPP
 
 #include <array>
+#include <mutex>
 
 #include <opencv2/core/core.hpp>
 
@@ -21,6 +22,9 @@ public:
   void setupOpenGL(int width, int height);
   void draw();
   void cleanupOpenGL();
+
+private:
+  std::mutex m_mutex;
 };
 
 

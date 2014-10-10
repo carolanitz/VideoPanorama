@@ -2,7 +2,6 @@
 
 #include <GL/gl.h>
 
-
 Painter::Painter()
 {
 
@@ -35,11 +34,13 @@ void Painter::updateHomography2(cv::Mat H)
 
 void Painter::setupOpenGL(int width, int height)
 {
-
+  std::lock_guard<std::mutex> lock(m_mutex);
 }
 
 void Painter::draw()
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
   glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer (background)
 
@@ -57,5 +58,5 @@ void Painter::draw()
 
 void Painter::cleanupOpenGL()
 {
-
+  std::lock_guard<std::mutex> lock(m_mutex);
 }
