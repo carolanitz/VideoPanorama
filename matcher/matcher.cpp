@@ -72,9 +72,16 @@ void Matcher::updateIntermediate()
   // we have collected sensor data so far -> 
   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].conjugate();
   
-  // move matched poitns even further (based on sensors)
+  // move matched poitns even further (based on the sensors)
   H = H * m_K * R.toRotationMatrix() * m_iK;
   H /= H(2,2);
+  
+  float a = 0.3; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  for (int i=0; i < 3; i++)
+    for (int j=0; j < 3; j++)
+      H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
+  
+  m_lastH = H;
   
   cv::Mat cvH;
   cv::eigen2cv<float,3,3>(H, cvH);

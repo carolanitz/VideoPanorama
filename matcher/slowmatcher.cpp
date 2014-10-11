@@ -69,7 +69,6 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   
   // matching (simple nearest neighbours)
   cv::BFMatcher matcher(cv::NORM_HAMMING);
-  //cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20, 10, 4));
   std::vector< cv::DMatch > matches;
   matcher.match( descriptorsSrc, descriptorsDst, matches );
   

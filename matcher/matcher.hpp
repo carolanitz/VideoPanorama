@@ -37,6 +37,7 @@ private:
   cv::Mat m_H_1to2;
   Eigen::Matrix3f m_K;
   Eigen::Matrix3f m_iK;
+  Eigen::Matrix3f m_lastH;
   
   // called from the slow matcher when matching is finished
   void matched1to2(bool, cv::Mat H);
