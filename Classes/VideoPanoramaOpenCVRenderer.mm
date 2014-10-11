@@ -100,8 +100,8 @@
 	// We only need to work on columms from [0, width - 1] regardless.
 	
 	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage, cv::Vec4f(), 0);
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(bgraImage, cv::Vec4f(), 0);
+    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), cv::Vec4f(), 0);
+    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(bgraImage.clone(), cv::Vec4f(), 0);
 
 
 	CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
