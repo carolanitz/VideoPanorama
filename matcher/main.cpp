@@ -7,6 +7,16 @@
 #include <string>
 #include <boost/filesystem.hpp>
 
+struct Data
+{
+   cv::Mat img;
+   cv::Vec3f gyro;
+   int64_t timestamp;
+   cv::Vec4f orientation;
+};
+
+std::vector<Data> input[2];
+size_t inputIndex[2] = {0,0};
 
 cv::VideoCapture video0, video1;
 Matcher matcher;
@@ -27,30 +37,49 @@ void display() {
   matcher.draw();
 }
 
-void timer(int) {
+// -------------------------------------------------------------------------------------------------
+void timer(int)
+{
+  cv::Mat frame0, frame1;
+  cv::Vec4f orientation0(0,0,0,0);
+  cv::Vec4f orientation1(0,0,0,0);
+  int64_t time0 = 0, time1 = 0;
+  
   //grab and retrieve each frames of the video sequentially
-  cv::Mat3b frame0;
-  video0 >> frame0;
-  cv::Mat3b frame1;
-  video1 >> frame1;
-
-  matcher.updateImage1(frame0, {0, 0, 0, 0}, 0);
-  matcher.updateImage2(frame1, {0, 0, 0, 0}, 0);
+  if (!input[0].empty() && !input[1].empty())
+  {
+    frame0 = input[0][inputIndex[0]].img;
+    frame1 = input[1][inputIndex[0]].img;
+    
+    time0 = input[0][inputIndex[0]].timestamp;
+    time1 = input[1][inputIndex[0]].timestamp;
+    
+    orientation0 = input[0][inputIndex[0]].orientation;
+    orientation1 = input[1][inputIndex[0]].orientation;
+    
+    inputIndex[0] = (inputIndex[0] + 1) % input[0].size();
+    inputIndex[1] = (inputIndex[1] + 1) % input[1].size();
+  }else
+  {
+    video0 >> frame0;
+    video1 >> frame1;
+  }
+  
+  /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
+  cv::imshow("imgae1", frame0);
+  cv::imshow("imgae2", frame1);
+  cv::waitKey(0);*/
+  
+  
+  matcher.updateImage1(frame0, orientation0, time0);
+  matcher.updateImage2(frame1, orientation1, time1);
 
   glutTimerFunc(refreshMillis, timer, 0); // subsequent timer call at milliseconds
           glutPostRedisplay();
 }
 
-struct Data
-{
-   cv::Mat img;
-   cv::Vec3f gyro;
-   int64_t timestamp;
-};
-
-std::vector<Data> input[2];
-
-void readInput(const std::string& in1, const std::string& in2)
+// -------------------------------------------------------------------------------------------------
+bool readInput(const std::string& in1, const std::string& in2)
 {
     namespace fs = boost::filesystem;
     std::string dir[2];
@@ -86,11 +115,22 @@ void readInput(const std::string& in1, const std::string& in2)
 
            Data d;
            d.img = cv::imread(imgfile);
+           
+           FILE* dat = fopen(datfile.c_str(), "r");
+                
+           fscanf(dat, "%ld\n", &d.timestamp);
+           fscanf(dat, "%f %f %f %f\n", &d.orientation[0], &d.orientation[1], &d.orientation[2], &d.orientation[3]);
+           fscanf(dat, "%f %f %f\n", &d.gyro[0], &d.gyro[1], &d.gyro[2]);
+           fclose(dat);
+           
            input[i].push_back(d);
         }
     }
+    
+    return !input[0].empty() && !input[1].empty();
 }
 
+// -------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   if (argc < 3) {
@@ -101,11 +141,10 @@ int main(int argc, char* argv[])
   video0 = cv::VideoCapture(argv[1]);
   video1 = cv::VideoCapture(argv[2]);
 
-  if(!video0.isOpened()) {
-    return 1;
-  }
-  if(!video1.isOpened()) {
-    return 1;
+  if(!video0.isOpened() || !video1.isOpened())
+  {
+    if (!readInput(argv[1], argv[2]))
+      return 1;
   }
 
   // Drawing

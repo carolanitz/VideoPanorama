@@ -25,8 +25,18 @@ public:
 private:
   Painter m_painter;
   FastMatcher m_fastMatcher;
-  SlowMatcher m_slowMatcher;
+  QualityMatcher m_qualityMatcher;
   std::mutex m_mutex;
+
+  
+  cv::Mat m_lastImage[2];
+  cv::Mat m_H_1to2;
+  
+  // called from the slow matcher when matching is finished
+  void matched1to2(bool, cv::Mat H);
+  void matched2to1(bool, cv::Mat H);
+
+  bool m_matcherAvalable;
 };
 
 
