@@ -102,7 +102,7 @@
 	// We only need to work on columms from [0, width - 1] regardless.
    cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
 
-   if (!isSender)
+   if (!isSender && isStarted)
    {
       std::vector<uchar> buffer;
       std::vector<int> params;

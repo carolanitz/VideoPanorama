@@ -136,6 +136,9 @@
 	_allowedToUseGPU = ( [UIApplication sharedApplication].applicationState != UIApplicationStateBackground );
 	self.capturePipeline.renderingEnabled = _allowedToUseGPU;
 	
+[   self.capturePipeline startRunning];
+
+   
     [super viewDidLoad];
 }
 
@@ -155,7 +158,7 @@
 	[self.labelTimer invalidate];
 	self.labelTimer = nil;
 	
-	[self.capturePipeline stopRunning];
+	//[self.capturePipeline stopRunning];
 }
 
 - (NSUInteger)supportedInterfaceOrientations

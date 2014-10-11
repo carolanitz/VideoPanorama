@@ -58,7 +58,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
       }
       else
       {
-        self.capturePipeline.startRunning()
+         isStarted = true;
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary
         self.capturePipeline.videoDevice.lockForConfiguration(nil)
@@ -98,7 +98,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     
     @IBAction func send() {
       isSender = true;
-        self.capturePipeline.startRunning()
+      isStarted = true;
         var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("sendSettings"), userInfo: nil, repeats: false)
 
 //        if session.connectedPeers.count != 1 {

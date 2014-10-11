@@ -50,9 +50,12 @@
 #import "VideoPanoramaAppDelegate.h"
 #import "Globals.h"
 
+BOOL isStarted;
+
 int main(int argc, char *argv[])
 {
    isSender = false;
+   isStarted = false;
 
 	int retVal = 0;
 	@autoreleasepool {
