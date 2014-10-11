@@ -30,10 +30,10 @@ void Matcher::cleanupOpenGL()
 
 void Matcher::updateImage2(cv::Mat image, cv::Vec4f gyro)
 {
-
+  painter.updateImage1(image);
 }
 
 void Matcher::updateImage1(cv::Mat image, cv::Vec4f gyro)
 {
-
+  painter.updateImage2(image);
 }

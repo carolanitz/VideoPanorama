@@ -6,6 +6,11 @@
 
 #include <opencv2/core/core.hpp>
 
+
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
+
 class Painter {
 
 public:
@@ -25,6 +30,11 @@ public:
 
 private:
   std::mutex m_mutex;
+
+  cv::Mat m_image1, m_image2;
+
+  GLuint m_textures[2];
+
 };
 
 

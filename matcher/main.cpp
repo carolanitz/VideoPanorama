@@ -8,9 +8,17 @@ Matcher matcher;
 
 int refreshMillis = 80;      // Refresh period in milliseconds
 
+bool setup = false;
+
+int w = 800;
+int h = 600;
 /* Handler for window-repaint event. Call back when the window first appears and
    whenever the window needs to be re-painted. */
 void display() {
+  if (!setup)
+  {
+    matcher.setupOpenGL(w, h);
+  }
   matcher.draw();
 }
 
@@ -25,6 +33,7 @@ void timer(int) {
   matcher.updateImage2(frame1, {0, 0, 0, 0});
 
   glutTimerFunc(refreshMillis, timer, 0); // subsequent timer call at milliseconds
+          glutPostRedisplay();
 }
 
 int main(int argc, char* argv[])
@@ -47,7 +56,7 @@ int main(int argc, char* argv[])
   // Drawing
   glutInit(&argc, argv);                 // Initialize GLUT
   glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
-  glutInitWindowSize(320, 320);   // Set the window's initial width & height
+  glutInitWindowSize(w, h);   // Set the window's initial width & height
   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
   glutDisplayFunc(display); // Register display callback handler for window re-paint
   glutTimerFunc(0, timer, 0);   // First timer call immediately
