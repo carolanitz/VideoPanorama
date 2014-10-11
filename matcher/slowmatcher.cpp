@@ -1,4 +1,5 @@
 #include "slowmatcher.hpp"
+#include "utils.hpp"
 
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -21,6 +22,7 @@ QualityMatcher::~QualityMatcher()
   }
 }
 
+
 // ----------------------------------------------------------------------------------
 void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb)
 {
@@ -38,21 +40,24 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::Mat descriptorsSrc, descriptorsDst;
   
   // detect
-  /*cv::ORB detector(200,1.5f,6);
-  detector.compute(imgSrc, cv::Mat(), featuresSrc, descriptorsSrc);
-  detector.compute(imgDst, cv::Mat(), featuresDst, descriptorsDst);
-  */
+  
+  //cv::Ptr<cv::FeatureDetector> detector = cv::FeatureDetector::create("ORB");
+  cv::Ptr<cv::DescriptorExtractor> descriptor = cv::DescriptorExtractor::create("ORB" );
+  //detector->detect(imgSrc, featuresSrc);
+  //detector->detect(imgDst, featuresDst);
   
   // features
   cv::FAST(imgSrc, featuresSrc, 40, cv::FastFeatureDetector::TYPE_9_16);
   cv::FAST(imgDst, featuresDst, 40, cv::FastFeatureDetector::TYPE_9_16);
   
-  printf("input %d vs %d\n", featuresSrc.size(), featuresDst.size());
+  printf("input %d vs %d\n", (int)featuresSrc.size(), (int)featuresDst.size());
+  descriptor->compute(imgSrc, featuresSrc, descriptorsSrc);
+  descriptor->compute(imgDst, featuresDst, descriptorsDst);
   
   // descriptors
-  cv::BriefDescriptorExtractor brief;
-  brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
-  brief.compute(imgDst, featuresDst, descriptorsDst);
+  //cv::BriefDescriptorExtractor brief;
+  //brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
+  //brief.compute(imgDst, featuresDst, descriptorsDst);
   
   if (featuresDst.size() < 10 || featuresSrc.size() < 10
       || descriptorsSrc.rows != featuresSrc.size()
@@ -63,7 +68,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   }
   
   // matching (simple nearest neighbours)
-  cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,4));
+  cv::BFMatcher matcher(cv::NORM_HAMMING);
   std::vector< cv::DMatch > matches;
   matcher.match( descriptorsSrc, descriptorsDst, matches );
   
@@ -78,11 +83,13 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   std::vector<cv::Point2f> ptsSrc, ptsDst;
   for( int i = 0; i < matches.size(); i++ )
   {
-    //if( matches[i].distance <= std::max(2. * min_dist, 0.02) )
+    if( matches[i].distance <= 15)//std::max(4. * min_dist, 0.02) )
     {
       goodMatches.push_back(matches[i]);
     }
   }
+  printf("min = %f - %d\n", min_dist, goodMatches.size());
+  
   for( int i = 0; i < goodMatches.size(); i++ )
   {
     ptsSrc.push_back( featuresSrc[ goodMatches[i].queryIdx ].pt );
@@ -91,17 +98,10 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   
   if (goodMatches.size() < 10)
   {
+    printf("MATCH FAILED\n");
     cb(false, priorH);
     return;
   }
-  
-  
-  /*for (cv::Point2f& pt : ptsSrc)
-    cv::circle(imgSrc, pt, 5, cv::Scalar(255,0,255));
-  
-  for (cv::Point2f& pt : ptsDst)
-    cv::circle(imgDst, pt, 5, cv::Scalar(255,0,255));
-  */
   
   /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
   cv::Mat img;
@@ -113,12 +113,17 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::waitKey(0); */
   
   
-  cv::Mat H = priorH;
-  H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
-   
+  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC);
+  H.convertTo(H, CV_32FC1);
   cb(true, H);
   
-  printf("matched %d features\n", featuresSrc.size());
+  // DEBUG  
+  /*printf("H:\n");
+  for (int i=0; i < 3; i++)
+    printf("%f %f %f\n", H.at<float>(i,0), H.at<float>(i,1), H.at<float>(i,2));
+  */
+  
+  printf("matched %d features\n", (int)featuresSrc.size());
 }
 
 // ----------------------------------------------------------------------------------

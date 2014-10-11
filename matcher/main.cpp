@@ -21,12 +21,13 @@ size_t inputIndex[2] = {0,0};
 cv::VideoCapture video0, video1;
 Matcher matcher;
 
-int refreshMillis = 80;      // Refresh period in milliseconds
+int refreshMillis = 20;      // Refresh period in milliseconds
 
 bool setup = false;
 
 int w = 800;
 int h = 600;
+
 /* Handler for window-repaint event. Call back when the window first appears and
    whenever the window needs to be re-painted. */
 void display()
