@@ -15,6 +15,8 @@ set(SOURCES
   painter.hpp
   painter.cpp)
 
+add_definitions(-DTARGET_IPHONE_SIMULATOR)
+
 add_executable(matcher ${SOURCES})
 
 find_package(OpenCV REQUIRED)
