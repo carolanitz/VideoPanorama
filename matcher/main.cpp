@@ -52,13 +52,13 @@ void timer(int)
   if (!input[0].empty() && !input[1].empty())
   {
     frame0 = input[0][inputIndex[0]].img;
-    frame1 = input[1][inputIndex[0]].img;
+    frame1 = input[1][inputIndex[1]].img;
     
     time0 = input[0][inputIndex[0]].timestamp;
-    time1 = input[1][inputIndex[0]].timestamp;
+    time1 = input[1][inputIndex[1]].timestamp;
     
     orientation0 = input[0][inputIndex[0]].orientation;
-    orientation1 = input[1][inputIndex[0]].orientation;
+    orientation1 = input[1][inputIndex[1]].orientation;
     
     inputIndex[0] = (inputIndex[0] + 1) % input[0].size();
     inputIndex[1] = (inputIndex[1] + 1) % input[1].size();

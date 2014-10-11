@@ -1,6 +1,7 @@
 #include "matcher.hpp"
 
 #include <functional>
+#include <iostream>
 
 // ----------------------------------------------------------------------------------
 Matcher::Matcher()
@@ -30,6 +31,7 @@ void Matcher::draw()
   std::lock_guard<std::mutex> lock(m_mutex);
   
   m_painter.draw();
+  std::cout.flush();
 }
 
 // ----------------------------------------------------------------------------------

@@ -44,8 +44,10 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   */
   
   // features
-  cv::FAST(imgSrc, featuresSrc, 50, cv::FastFeatureDetector::TYPE_9_16);
-  cv::FAST(imgDst, featuresDst, 50, cv::FastFeatureDetector::TYPE_9_16);
+  cv::FAST(imgSrc, featuresSrc, 40, cv::FastFeatureDetector::TYPE_9_16);
+  cv::FAST(imgDst, featuresDst, 40, cv::FastFeatureDetector::TYPE_9_16);
+  
+  printf("input %d vs %d\n", featuresSrc.size(), featuresDst.size());
   
   // descriptors
   cv::BriefDescriptorExtractor brief;
@@ -76,7 +78,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   std::vector<cv::Point2f> ptsSrc, ptsDst;
   for( int i = 0; i < matches.size(); i++ )
   {
-    if( matches[i].distance <= std::max(3. * min_dist, 0.02) )
+    //if( matches[i].distance <= std::max(2. * min_dist, 0.02) )
     {
       goodMatches.push_back(matches[i]);
     }
@@ -99,22 +101,24 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   
   for (cv::Point2f& pt : ptsDst)
     cv::circle(imgDst, pt, 5, cv::Scalar(255,0,255));
+  */
   
-  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
+  /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
   cv::Mat img;
-  cv::drawMatches(imgSrc, featuresSrc, imgDst, featuresDst, matches, img);
+  cv::drawMatches(imgSrc, featuresSrc, imgDst, featuresDst, goodMatches, img);
   cv::imshow("imgae1", img);
   
   //cv::imshow("imgae1", imgSrc);
   //cv::imshow("imgae2", imgDst);
-  cv::waitKey(0); 
-  */
+  cv::waitKey(0); */
+  
   
   cv::Mat H = priorH;
   H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
-  
+   
   cb(true, H);
   
+  printf("matched %d features\n", featuresSrc.size());
 }
 
 // ----------------------------------------------------------------------------------
