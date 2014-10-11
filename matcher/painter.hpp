@@ -5,7 +5,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#if TARGET_IPHONE_SIMULATOR
+#if TARGET_DACUDAS_LINUX_BUILD_SERVER_PLEASE_RENAME
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
