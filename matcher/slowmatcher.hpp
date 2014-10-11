@@ -10,8 +10,18 @@ public:
   ~SlowMatcher();
 
   // Set new images
-  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
-  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
+  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion);
+  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion);
+
+  cv::Mat image1();
+  cv::Mat image2();
+
+  cv::Mat homography1();
+  cv::Mat homography2();
+
+private:
+  cv::Mat m_image1;
+  cv::Mat m_image2;
 };
 
 

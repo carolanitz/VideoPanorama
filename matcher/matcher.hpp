@@ -4,6 +4,8 @@
 #include <opencv2/core/core.hpp>
 
 #include "painter.hpp"
+#include "fastmatcher.hpp"
+#include "slowmatcher.hpp"
 
 class Matcher {
 
@@ -21,7 +23,10 @@ public:
   void cleanupOpenGL();
 
 private:
-  Painter painter;
+  Painter m_painter;
+  FastMatcher m_fastMatcher;
+  SlowMatcher m_slowMatcher;
+  std::mutex m_mutex;
 };
 
 

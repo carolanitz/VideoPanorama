@@ -12,6 +12,16 @@ public:
   // Set new images
   void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
   void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
+
+  cv::Mat image1();
+  cv::Mat image2();
+
+  cv::Vec4f quaternion1();
+  cv::Vec4f quaternion2();
+
+private:
+  cv::Mat m_image1;
+  cv::Mat m_image2;
 };
 
 
