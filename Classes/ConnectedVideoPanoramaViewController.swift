@@ -16,6 +16,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     var peerID: MCPeerID
     var session: MCSession
     var advertiser: MCAdvertiserAssistant
+    var outputStream: NSOutputStream?
     
     required init(coder aDecoder: NSCoder) {
         peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
@@ -74,8 +75,9 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         }
         let peer = session.connectedPeers[0] as MCPeerID
         println("About to send the video to \(peer.displayName)")
-        let stream = session.startStreamWithName("Video", toPeer: peer, error: nil)
-        
+        outputStream = session.startStreamWithName("Video", toPeer: peer, error: nil)
+        let compressor = VideoCompressor(size: CGSize(width: 1280, height: 720), stream: outputStream)
+        self.capturePipeline.compressor = compressor
     }
     
     

@@ -66,7 +66,6 @@
 @property(nonatomic, retain) IBOutlet UILabel *dimensionsLabel;
 @property(nonatomic, retain) NSTimer *labelTimer;
 @property(nonatomic, retain) GLKView *previewView;
-@property(nonatomic, retain) VideoPanoramaCapturePipeline *capturePipeline;
 
 @end
 
@@ -80,7 +79,7 @@
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:[UIDevice currentDevice]];
 		[[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 	}
-
+    
 	[_recordButton release];
 	[_framerateLabel release];
 	[_dimensionsLabel release];

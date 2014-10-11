@@ -590,6 +590,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 			//[self renderVideoSampleBuffer:sampleBuffer];
 		}
         [self.motionSynchronizer appendSampleBufferForSynchronization:sampleBuffer];
+        [self.compressor encodeFrame:sampleBuffer];
 	}
 }
 

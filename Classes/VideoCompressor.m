@@ -24,10 +24,12 @@ static void outputCallback (void *outputCallbackRefCon,
 
 @implementation VideoCompressor
 
-- (instancetype)initWithSize:(CGSize)size
+- (instancetype)initWithSize:(CGSize)size stream:(NSOutputStream *)stream;
 {
     self = [super init];
     if (self) {
+        _stream = stream;
+        
         VTCompressionSessionRef session;
         
         OSStatus status = VTCompressionSessionCreate(NULL, //Allocator
@@ -88,9 +90,9 @@ static void outputCallback (void *outputCallbackRefCon,
     size_t dataLength;
     char* dataData; //haha
     CMBlockBufferGetDataPointer(dataBuffer, 0, NULL, &dataLength, &dataData);
-    NSDictionary *dict = @{@"format": [NSData dataWithBytesNoCopy:formatData length:formatLength],
-                           @"data": [NSData dataWithBytesNoCopy:dataData length:dataLength],
-                           @"time": [NSValue valueWithCMTime:time]};
+    NSDictionary *dict = @{@"format": [NSData dataWithBytes:formatData length:formatLength],
+                           @"data": [NSData dataWithBytes:dataData length:dataLength],
+                           @"time": [(NSDictionary *)CMTimeCopyAsDictionary(time, NULL) autorelease]};
     NSData *dataWeActuallySend = [NSKeyedArchiver archivedDataWithRootObject:dict];
     [compressor.stream write:dataWeActuallySend.bytes maxLength:dataWeActuallySend.length];
 }

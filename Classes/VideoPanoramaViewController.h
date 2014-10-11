@@ -49,6 +49,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class VideoPanoramaCapturePipeline;
+
 @interface VideoPanoramaViewController : UIViewController
+
+@property(nonatomic, retain) VideoPanoramaCapturePipeline *capturePipeline;
 
 @end

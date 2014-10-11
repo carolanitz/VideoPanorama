@@ -6,14 +6,16 @@
 //
 //
 
-@import CoreMedia;
-@import CoreVideo;
+#import <CoreMedia/CoreMedia.h>
+#import <CoreVideo/CoreVideo.h>
 
 #import <Foundation/Foundation.h>
 
 @interface VideoCompressor : NSObject
 
-@property (strong) NSOutputStream *stream;
+- (instancetype)initWithSize:(CGSize)size stream:(NSOutputStream *)stream NS_DESIGNATED_INITIALIZER;
+
+@property (strong, readonly) NSOutputStream *stream;
 
 - (void)encodeFrame:(CMSampleBufferRef)sampleBuffer;
 
