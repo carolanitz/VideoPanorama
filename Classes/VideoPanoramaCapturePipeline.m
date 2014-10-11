@@ -57,6 +57,7 @@
 #import <ImageIO/CGImageProperties.h>
 
 #include <objc/runtime.h> // for objc_loadWeak() and objc_storeWeak()
+#import "MotionSynchronizer.h"
 
 /*
  RETAINED_BUFFER_COUNT is the number of pixel buffers we expect to hold on to from the renderer. This value informs the renderer how to size its buffer pool and how many pixel buffers to preallocate (done in the prepareWithOutputDimensions: method). Preallocation helps to lessen the chance of frame drops in our recording, in particular during recording startup. If we try to hold on to more buffers than RETAINED_BUFFER_COUNT then the renderer will fail to allocate new buffers from its pool and we will drop frames.
@@ -82,7 +83,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	VideoPanoramaRecordingStatusStoppingRecording,
 }; // internal state machine
 
-@interface VideoPanoramaCapturePipeline () < AVCaptureVideoDataOutputSampleBufferDelegate, MovieRecorderDelegate>
+@interface VideoPanoramaCapturePipeline () < AVCaptureVideoDataOutputSampleBufferDelegate, MovieRecorderDelegate, MotionSynchronizationDelegate>
 {
 	__weak id <VideoPanoramaCapturePipelineDelegate> _delegate; // __weak doesn't actually do anything under non-ARC
 	dispatch_queue_t _delegateCallbackQueue;
@@ -100,6 +101,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	
 	dispatch_queue_t _sessionQueue;
 	dispatch_queue_t _videoDataOutputQueue;
+    dispatch_queue_t _motionSyncedVideoQueue;
 	
 	id<VideoPanoramaRenderer> _renderer;
 	BOOL _renderingEnabled;
@@ -118,6 +120,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 
 @property(nonatomic, retain) __attribute__((NSObject)) CMFormatDescriptionRef outputVideoFormatDescription;
 @property(nonatomic, retain) MovieRecorder *recorder;
+@property(nonatomic, retain) MotionSynchronizer *motionSynchronizer;
 
 @end
 
@@ -134,13 +137,18 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 		_recordingURL = [[NSURL alloc] initFileURLWithPath:[NSString pathWithComponents:@[NSTemporaryDirectory(), @"Movie.MOV"]]];
 		
 		_sessionQueue = dispatch_queue_create( "com.apple.sample.capturepipeline.session", DISPATCH_QUEUE_SERIAL );
-		
+        _videoDataOutputQueue = dispatch_queue_create( "com.apple.sample.sessionmanager.video", DISPATCH_QUEUE_SERIAL );
+        dispatch_set_target_queue( _videoDataOutputQueue, dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0) );
+
+        _motionSynchronizer = [[MotionSynchronizer alloc] init];
+        _motionSyncedVideoQueue = dispatch_queue_create( "com.apple.sample.sessionmanager.motion", DISPATCH_QUEUE_SERIAL );
+        [_motionSynchronizer setSynchronizedSampleBufferDelegate:self queue:_motionSyncedVideoQueue];
+
 		// In a multi-threaded producer consumer system it's generally a good idea to make sure that producers do not get starved of CPU time by their consumers.
 		// In this app we start with VideoDataOutput frames on a high priority queue, and downstream consumers use default priority queues.
 		// Audio uses a default priority queue because we aren't monitoring it live and just want to get it into the movie.
 		// AudioDataOutput can tolerate more latency than VideoDataOutput as its buffers aren't allocated out of a fixed size pool.
-		_videoDataOutputQueue = dispatch_queue_create( "com.apple.sample.capturepipeline.video", DISPATCH_QUEUE_SERIAL );
-		dispatch_set_target_queue( _videoDataOutputQueue, dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_HIGH, 0 ) );
+
 		
 // USE_XXX_RENDERER is set in the project's build settings for each target
 #if USE_OPENCV_RENDERER
@@ -280,6 +288,8 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	NSString *sessionPreset = AVCaptureSessionPresetHigh;
 	CMTime frameDuration = kCMTimeInvalid;
 	// For single core systems like iPhone 4 and iPod Touch 4th Generation we use a lower resolution and framerate to maintain real-time performance.
+
+
 	if ( [NSProcessInfo processInfo].processorCount == 1 )
 	{
 		if ( [_captureSession canSetSessionPreset:AVCaptureSessionPreset640x480] ) {
@@ -319,7 +329,8 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	self.videoOrientation = _videoConnection.videoOrientation;
 	
 	[videoOut release];
-	
+    [self.motionSynchronizer setMotionRate:frameRate * 2];
+
 	return;
 }
 
@@ -442,8 +453,11 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 - (void)setupVideoPipelineWithInputFormatDescription:(CMFormatDescriptionRef)inputFormatDescription
 {
 	NSLog( @"-[%@ %@] called", NSStringFromClass([self class]), NSStringFromSelector(_cmd) );
-	
+
 	[self videoPipelineWillStartRunning];
+    [self.motionSynchronizer setSampleBufferClock:_captureSession.masterClock];
+
+    [self.motionSynchronizer start];
 	
 	self.videoDimensions = CMVideoFormatDescriptionGetDimensions( inputFormatDescription );
 	[_renderer prepareForInputWithFormatDescription:inputFormatDescription outputRetainedBufferCountHint:RETAINED_BUFFER_COUNT];
@@ -573,12 +587,13 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 			[self setupVideoPipelineWithInputFormatDescription:formatDescription];
 		}
 		else {
-			[self renderVideoSampleBuffer:sampleBuffer];
+			//[self renderVideoSampleBuffer:sampleBuffer];
 		}
+        [self.motionSynchronizer appendSampleBufferForSynchronization:sampleBuffer];
 	}
 }
 
-- (void)renderVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer
+- (void)renderVideoSampleBuffer:(CMSampleBufferRef)sampleBuffer motion:(CMDeviceMotion *)motion
 {
 	CVPixelBufferRef renderedPixelBuffer = NULL;
 	CMTime timestamp = CMSampleBufferGetPresentationTimeStamp( sampleBuffer );
@@ -591,7 +606,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	{
 		if ( _renderingEnabled ) {
 			CVPixelBufferRef sourcePixelBuffer = CMSampleBufferGetImageBuffer( sampleBuffer );
-			renderedPixelBuffer = [_renderer copyRenderedPixelBuffer:sourcePixelBuffer];
+			renderedPixelBuffer = [_renderer copyRenderedPixelBuffer:sourcePixelBuffer motion:motion];
 		}
 		else {
 			return;
@@ -865,4 +880,38 @@ static CGFloat angleOffsetFromPortraitOrientationToOrientation(AVCaptureVideoOri
 	}
 }
 
+- (void)motionSynchronizer:(MotionSynchronizer *)synchronizer didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer withMotion:(CMDeviceMotion *)motion
+{
+    CVPixelBufferRef renderedPixelBuffer = NULL;
+    CMTime timestamp = CMSampleBufferGetPresentationTimeStamp( sampleBuffer );
+
+    [self calculateFramerateAtTimestamp:timestamp];
+
+    // We must not use the GPU while running in the background.
+    // setRenderingEnabled: takes the same lock so the caller can guarantee no GPU usage once the setter returns.
+    @synchronized( _renderer ) {
+        if ( _renderingEnabled ) {
+            CVPixelBufferRef sourcePixelBuffer = CMSampleBufferGetImageBuffer( sampleBuffer );
+            renderedPixelBuffer = [_renderer copyRenderedPixelBuffer:sourcePixelBuffer motion:motion];
+        }
+        else {
+            return;
+        }
+    }
+
+    @synchronized( self ) {
+        if ( renderedPixelBuffer ) {
+            [self outputPreviewPixelBuffer:renderedPixelBuffer];
+//
+//            if ( _recordingStatus == VideoSnakeRecordingStatusRecording ) {
+//                [self.recorder appendVideoPixelBuffer:renderedPixelBuffer withPresentationTime:timestamp];
+//            }
+
+            CFRelease( renderedPixelBuffer );
+        }
+        else {
+            [self videoPipelineDidRunOutOfBuffers];
+        }
+    }
+}
 @end

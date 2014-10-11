@@ -1,8 +1,7 @@
-
 /*
-     File: VideoPanoramaAppDelegate.h
- Abstract: Application delegate
-  Version: 2.1
+     File: MotionSynchronizer.h
+ Abstract: Synchronizes motion samples with media samples
+  Version: 2.2
  
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple
  Inc. ("Apple") in consideration of your agreement to the following
@@ -46,19 +45,30 @@
  
  */
 
+#import <Foundation/Foundation.h>
+#import <CoreMedia/CMSampleBuffer.h>
+#import <CoreMedia/CMSync.h>
 
-#import <UIKit/UIKit.h>
-#import "matcher.hpp"
-#import <CoreMotion/CoreMotion.h>
+@class CMDeviceMotion;
 
-@interface VideoPanoramaAppDelegate : UIResponder <UIApplicationDelegate>{
-    Matcher matcher;
-}
+@protocol MotionSynchronizationDelegate;
 
-+ (instancetype)sharedDelegate;
+@interface MotionSynchronizer : NSObject
 
-@property(nonatomic, retain) UIWindow *window;
+@property(nonatomic) int motionRate;
+@property(nonatomic, retain) __attribute__((NSObject)) CMClockRef sampleBufferClock; // safe to update if you aren't concurrently calling appendSampleBufferForSynchronization:
 
--(Matcher *)getMatcher;
+- (void)start;
+- (void)stop;
+
+- (void)appendSampleBufferForSynchronization:(CMSampleBufferRef)sampleBuffer;
+- (void)setSynchronizedSampleBufferDelegate:(id<MotionSynchronizationDelegate>)sampleBufferDelegate queue:(dispatch_queue_t)sampleBufferCallbackQueue;
+
+@end
+
+@protocol MotionSynchronizationDelegate <NSObject>
+
+@required
+- (void)motionSynchronizer:(MotionSynchronizer *)synchronizer didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer withMotion:(CMDeviceMotion*)motion;
 
 @end

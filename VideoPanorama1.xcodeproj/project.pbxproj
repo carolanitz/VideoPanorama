@@ -15,6 +15,7 @@
 		41F775AF19E9457E00F0F4C4 /* matcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775A619E9457E00F0F4C4 /* matcher.cpp */; };
 		41F775B019E9457E00F0F4C4 /* painter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775A819E9457E00F0F4C4 /* painter.cpp */; };
 		41F775B119E9457E00F0F4C4 /* slowmatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775AA19E9457E00F0F4C4 /* slowmatcher.cpp */; };
+		41F775B519E959B200F0F4C4 /* MotionSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 41F775B419E959B200F0F4C4 /* MotionSynchronizer.m */; };
 		696D280B19CA539900A23D81 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F90DDE51395CAAA00125BDA /* main.mm */; };
 		696D280C19CA539900A23D81 /* VideoPanoramaAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F90DDE91395CAAA00125BDA /* VideoPanoramaAppDelegate.mm */; };
 		696D280D19CA539900A23D81 /* VideoPanoramaViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6F90DDED1395CAAA00125BDA /* VideoPanoramaViewController.mm */; };
@@ -62,6 +63,8 @@
 		41F775A919E9457E00F0F4C4 /* painter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = painter.hpp; sourceTree = "<group>"; };
 		41F775AA19E9457E00F0F4C4 /* slowmatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slowmatcher.cpp; sourceTree = "<group>"; };
 		41F775AB19E9457E00F0F4C4 /* slowmatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = slowmatcher.hpp; sourceTree = "<group>"; };
+		41F775B319E959B200F0F4C4 /* MotionSynchronizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MotionSynchronizer.h; sourceTree = "<group>"; };
+		41F775B419E959B200F0F4C4 /* MotionSynchronizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MotionSynchronizer.m; sourceTree = "<group>"; };
 		5DBA2A9819C232E200530F7A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = Resources/en.lproj/Launch.storyboard; sourceTree = SOURCE_ROOT; };
 		5DC09BED19B7F1A70025A16E /* VideoPanoramaRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = VideoPanoramaRenderer.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		696D282919CA539900A23D81 /* VideoPanorama.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoPanorama.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -145,6 +148,15 @@
 			path = matcher;
 			sourceTree = "<group>";
 		};
+		41F775B219E959A200F0F4C4 /* Motion */ = {
+			isa = PBXGroup;
+			children = (
+				41F775B319E959B200F0F4C4 /* MotionSynchronizer.h */,
+				41F775B419E959B200F0F4C4 /* MotionSynchronizer.m */,
+			);
+			name = Motion;
+			sourceTree = "<group>";
+		};
 		5DC09BF119B7F51B0025A16E /* Renderers */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,6 +215,7 @@
 		6F90DDDF1395CAAA00125BDA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				41F775B219E959A200F0F4C4 /* Motion */,
 				8252DB3719E937DE00403DCB /* Connectivity */,
 				6F90DDEB1395CAAA00125BDA /* VideoPanoramaViewController.h */,
 				6F90DDED1395CAAA00125BDA /* VideoPanoramaViewController.mm */,
@@ -344,6 +357,7 @@
 				41F775AF19E9457E00F0F4C4 /* matcher.cpp in Sources */,
 				41F775B019E9457E00F0F4C4 /* painter.cpp in Sources */,
 				41F775B119E9457E00F0F4C4 /* slowmatcher.cpp in Sources */,
+				41F775B519E959B200F0F4C4 /* MotionSynchronizer.m in Sources */,
 				696D281119CA539900A23D81 /* MovieRecorder.m in Sources */,
 				8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */,
 				696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */,

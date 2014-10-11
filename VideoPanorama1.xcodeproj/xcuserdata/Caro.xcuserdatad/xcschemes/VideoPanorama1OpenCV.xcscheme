@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "696D280919CA539900A23D81"
-               BuildableName = "RosyWriterOpenCV.app"
+               BuildableName = "VideoPanorama.app"
                BlueprintName = "VideoPanorama1OpenCV"
                ReferencedContainer = "container:VideoPanorama1.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "696D280919CA539900A23D81"
-            BuildableName = "RosyWriterOpenCV.app"
+            BuildableName = "VideoPanorama.app"
             BlueprintName = "VideoPanorama1OpenCV"
             ReferencedContainer = "container:VideoPanorama1.xcodeproj">
          </BuildableReference>
@@ -52,7 +52,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "696D280919CA539900A23D81"
-            BuildableName = "RosyWriterOpenCV.app"
+            BuildableName = "VideoPanorama.app"
             BlueprintName = "VideoPanorama1OpenCV"
             ReferencedContainer = "container:VideoPanorama1.xcodeproj">
          </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "696D280919CA539900A23D81"
-            BuildableName = "RosyWriterOpenCV.app"
+            BuildableName = "VideoPanorama.app"
             BlueprintName = "VideoPanorama1OpenCV"
             ReferencedContainer = "container:VideoPanorama1.xcodeproj">
          </BuildableReference>
