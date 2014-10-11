@@ -32,6 +32,10 @@ private:
   std::mutex m_mutex;
 
   cv::Mat m_image1, m_image2;
+
+  bool m_texture1Created = false;
+  bool m_texture2Created = false;
+
   GLuint m_shaderProgram;
   GLuint m_textures[2];
 

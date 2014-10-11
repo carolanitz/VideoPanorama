@@ -1,5 +1,7 @@
 #include "painter.hpp"
 
+#include <iostream>
+
 // Shader sources
 const GLchar* vertexSource = R"(
     #version 300 es
@@ -22,7 +24,7 @@ const GLchar* fragmentSource = R"(
     out vec4 outColor;
     uniform sampler2D image;
     void main() {
-       outColor = texture(image, Texcoord);
+       outColor = vec4(texture(image, Texcoord).bgr, 1.0);
     }
 )";
 
@@ -57,16 +59,26 @@ void Painter::updateHomography2(cv::Mat H)
 
 }
 
-void checkErrors() {
+void _check_gl_error(const char* file, int line) {
+        GLenum err (glGetError());
 
-  GLenum errCode;
-  const GLubyte *errString;
+        while(err!=GL_NO_ERROR) {
+                std::string error;
 
-  if ((errCode = glGetError()) != GL_NO_ERROR) {
-    printf("OpenGL Error: 0x%x\n", errCode);
-  }
+                switch(err) {
+                        case GL_INVALID_OPERATION:      error="INVALID_OPERATION";      break;
+                        case GL_INVALID_ENUM:           error="INVALID_ENUM";           break;
+                        case GL_INVALID_VALUE:          error="INVALID_VALUE";          break;
+                        case GL_OUT_OF_MEMORY:          error="OUT_OF_MEMORY";          break;
+                        case GL_INVALID_FRAMEBUFFER_OPERATION:  error="INVALID_FRAMEBUFFER_OPERATION";  break;
+                }
 
+                std::cerr << "GL_" << error.c_str() <<" - "<<file<<":"<<line<<std::endl;
+                err=glGetError();
+        }
 }
+
+#define GL_CHECK() _check_gl_error(__FILE__,__LINE__)
 
 void Painter::setupOpenGL(int w, int h)
 {
@@ -101,8 +113,7 @@ void Painter::setupOpenGL(int w, int h)
     2, 3, 0
   };
 
-  checkErrors();
-
+  GL_CHECK();
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
@@ -127,7 +138,7 @@ void Painter::setupOpenGL(int w, int h)
     delete[] strInfoLog;
   }
 
-  checkErrors();
+  GL_CHECK();
 
   // Create and compile the fragment shader
   GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -148,7 +159,7 @@ void Painter::setupOpenGL(int w, int h)
     delete[] strInfoLog;
   }
 
-  checkErrors();
+  GL_CHECK();
 
   // Link the vertex and fragment shader into a shader program
   m_shaderProgram = glCreateProgram();
@@ -181,20 +192,20 @@ void Painter::setupOpenGL(int w, int h)
 
   glUseProgram(m_shaderProgram);
 
-  checkErrors();
+  GL_CHECK();
 
   // Specify the layout of the vertex data
   GLint posAttrib = glGetAttribLocation(m_shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
   glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
+  GL_CHECK();
+
   GLint texAttrib = glGetAttribLocation(m_shaderProgram, "texcoord");
   glEnableVertexAttribArray(texAttrib);
   glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
-  GLint HAttrib = glGetAttribLocation(m_shaderProgram, "H");
-  glEnableVertexAttribArray(HAttrib);
-  glVertexAttribPointer(HAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+  GL_CHECK();
 
   // Load textures
   glGenTextures(2, m_textures);
@@ -209,6 +220,8 @@ void Painter::setupOpenGL(int w, int h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  GL_CHECK();
+
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_textures[1]);
 
@@ -217,7 +230,7 @@ void Painter::setupOpenGL(int w, int h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  checkErrors();
+  GL_CHECK();
 }
 
 void Painter::draw()
@@ -234,8 +247,21 @@ void Painter::draw()
   if (!m_image1.empty())
   {
     glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+    GL_CHECK();
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image1.size().width, m_image1.size().height, 0, GL_BGR, GL_UNSIGNED_BYTE, m_image1.data);
+    if (m_texture1Created)
+    {
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image1.size().width, m_image1.size().height, GL_RGB, GL_UNSIGNED_BYTE, m_image1.data);
+      GL_CHECK();
+    }
+    else
+    {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image1.size().width, m_image1.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image1.data);
+
+      GL_CHECK();
+
+      m_texture1Created = true;
+    }
 
     float H[9] = {1, 0, 0,
                   0, 1, 0,
@@ -259,7 +285,18 @@ void Painter::draw()
   if (!m_image2.empty())
   {
     glBindTexture(GL_TEXTURE_2D, m_textures[1]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image2.size().width, m_image2.size().height, 0, GL_BGR, GL_UNSIGNED_BYTE, m_image2.data);
+
+    GL_CHECK();
+    if (m_texture2Created)
+    {
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image2.size().width, m_image2.size().height, GL_RGB, GL_UNSIGNED_BYTE, m_image2.data);
+      GL_CHECK();
+    }
+    else
+    {
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image2.size().width, m_image2.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image2.data);
+      m_texture2Created = true;
+    }
 
     float H[9] = {1, 0, 0.5,
                   0, 1, 0,
@@ -280,8 +317,7 @@ void Painter::draw()
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   }
 
-  checkErrors();
-
+  GL_CHECK();
 }
 
 void Painter::cleanupOpenGL()

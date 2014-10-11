@@ -23,6 +23,7 @@ void display() {
   if (!setup)
   {
     matcher.setupOpenGL(w, h);
+    setup = true;
   }
   matcher.draw();
 }
