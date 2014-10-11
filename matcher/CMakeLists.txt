@@ -8,6 +8,10 @@ set(SOURCES
   main.cpp
   matcher.hpp
   matcher.cpp
+  fastmatcher.cpp
+  fastmatcher.hpp
+  slowmatcher.cpp
+  slowmatcher.hpp
   painter.hpp
   painter.cpp)
 

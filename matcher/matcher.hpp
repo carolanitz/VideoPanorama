@@ -1,8 +1,6 @@
 #ifndef VIDEO_PANORAMA_MATCHER_MATCHER_HPP
 #define VIDEO_PANORAMA_MATCHER_MATCHER_HPP
 
-#include <array>
-
 #include <opencv2/core/core.hpp>
 
 #include "painter.hpp"
