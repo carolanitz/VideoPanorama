@@ -91,7 +91,6 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 	NSMutableArray *_previousSecondTimestamps;
 
 	AVCaptureSession *_captureSession;
-	AVCaptureDevice *_videoDevice;
 
 	AVCaptureConnection *_videoConnection;
 	BOOL _running;

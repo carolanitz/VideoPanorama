@@ -49,7 +49,6 @@
 #import "VideoPanoramaViewController.h"
 #import <GLKit/GLKit.h>
 #import <QuartzCore/QuartzCore.h>
-#import "VideoPanoramaCapturePipeline.h"
 #import "VideoPanoramaAppDelegate.h"
 
 @interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate, GLKViewDelegate>
@@ -66,7 +65,6 @@
 @property(nonatomic, retain) IBOutlet UILabel *dimensionsLabel;
 @property(nonatomic, retain) NSTimer *labelTimer;
 @property(nonatomic, retain) GLKView *previewView;
-@property(nonatomic, retain) VideoPanoramaCapturePipeline *capturePipeline;
 
 @end
 
@@ -146,7 +144,7 @@
 {
 	[super viewWillAppear:animated];
 	
-	[self.capturePipeline startRunning];
+	//[self.capturePipeline startRunning];
 	
 	self.labelTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(updateLabels) userInfo:nil repeats:YES];
 }
