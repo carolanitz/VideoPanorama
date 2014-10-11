@@ -50,6 +50,7 @@
 #import "Globals.h"
 
 BOOL isSender;
+BOOL canSend;
 MCSession *networkSession;
 
 @implementation VideoPanoramaAppDelegate
