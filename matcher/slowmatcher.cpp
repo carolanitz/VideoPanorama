@@ -5,7 +5,17 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/stitching/stitcher.hpp>
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
+
+
+using namespace cv;
+#include <iostream>
 
 // ----------------------------------------------------------------------------------
 QualityMatcher::QualityMatcher()
@@ -22,98 +32,69 @@ QualityMatcher::~QualityMatcher()
   }
 }
 
-
 // ----------------------------------------------------------------------------------
 void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb)
 {
-  // keypoints 
-  std::vector<cv::KeyPoint> featuresSrc;
-  std::vector<cv::KeyPoint> featuresDst;
-  
-  // TODO - use the provided prior
-  
-  // prefilter slightly
-  cv::Mat imgSrc, imgDst;
-  cv::medianBlur(imageSrc, imgSrc, 5);
-  cv::medianBlur(imageDst, imgDst, 5);
-  
-  cv::Mat descriptorsSrc, descriptorsDst;
-  
-  // detect
-  
-  //cv::Ptr<cv::FeatureDetector> detector = cv::FeatureDetector::create("ORB");
-  cv::Ptr<cv::DescriptorExtractor> descriptor = cv::DescriptorExtractor::create("ORB" );
-  //detector->detect(imgSrc, featuresSrc);
-  //detector->detect(imgDst, featuresDst);
-  
-  // features
-  cv::FAST(imgSrc, featuresSrc, 40, cv::FastFeatureDetector::TYPE_9_16);
-  cv::FAST(imgDst, featuresDst, 40, cv::FastFeatureDetector::TYPE_9_16);
-  
-  printf("input %d vs %d\n", (int)featuresSrc.size(), (int)featuresDst.size());
-  descriptor->compute(imgSrc, featuresSrc, descriptorsSrc);
-  descriptor->compute(imgDst, featuresDst, descriptorsDst);
-  
-  // descriptors
-  //cv::BriefDescriptorExtractor brief;
-  //brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
-  //brief.compute(imgDst, featuresDst, descriptorsDst);
-  
-  if (featuresDst.size() < 10 || featuresSrc.size() < 10
-      || descriptorsSrc.rows != featuresSrc.size()
-      || descriptorsDst.rows != featuresDst.size())
-  {
-    cb(false, priorH);
-    return;
-  }
-  
-  // matching (simple nearest neighbours)
-  cv::BFMatcher matcher(cv::NORM_HAMMING);
-  std::vector< cv::DMatch > matches;
-  matcher.match( descriptorsSrc, descriptorsDst, matches );
-  
-  // extract good matches  
-  float min_dist = FLT_MAX;
-  for( size_t i = 0; i < featuresSrc.size(); i++ )
-  { 
-    min_dist = std::min(min_dist, matches[i].distance);
-  }
-  
-  std::vector< cv::DMatch > goodMatches;
-  std::vector<cv::Point2f> ptsSrc, ptsDst;
-  for( int i = 0; i < matches.size(); i++ )
-  {
-    if( matches[i].distance <= 15)//std::max(4. * min_dist, 0.02) )
-    {
-      goodMatches.push_back(matches[i]);
-    }
-  }
-  printf("min = %f - %d\n", min_dist, goodMatches.size());
-  
-  for( int i = 0; i < goodMatches.size(); i++ )
-  {
-    ptsSrc.push_back( featuresSrc[ goodMatches[i].queryIdx ].pt );
-    ptsDst.push_back( featuresDst[ goodMatches[i].trainIdx ].pt );
-  }
-  
-  if (goodMatches.size() < 10)
-  {
-    printf("MATCH FAILED\n");
-    cb(false, priorH);
-    return;
-  }
-  
-  /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
-  cv::Mat img;
-  cv::drawMatches(imgSrc, featuresSrc, imgDst, featuresDst, goodMatches, img);
-  cv::imshow("imgae1", img);
-  
-  //cv::imshow("imgae1", imgSrc);
-  //cv::imshow("imgae2", imgDst);
-  cv::waitKey(0); */
-  
-  
-  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC);
+  cv::Stitcher stitcher = cv::Stitcher::createDefault(false);
+
+  //-- Step 1: Detect the keypoints using SURF Detector
+   int minHessian = 400;
+
+   SurfFeatureDetector detector( minHessian );
+
+   std::vector<KeyPoint> keypoints_object, keypoints_scene;
+
+   detector.detect( imageSrc, keypoints_object );
+   detector.detect( imageDst, keypoints_scene );
+
+   //-- Step 2: Calculate descriptors (feature vectors)
+   SurfDescriptorExtractor extractor;
+
+   Mat descriptors_object, descriptors_scene;
+
+   extractor.compute( imageSrc, keypoints_object, descriptors_object );
+   extractor.compute( imageDst, keypoints_scene, descriptors_scene );
+
+   //-- Step 3: Matching descriptor vectors using FLANN matcher
+   FlannBasedMatcher matcher;
+   std::vector< DMatch > matches;
+   matcher.match( descriptors_object, descriptors_scene, matches );
+
+   double max_dist = 0; double min_dist = 100;
+
+   //-- Quick calculation of max and min distances between keypoints
+   for( int i = 0; i < descriptors_object.rows; i++ )
+   { double dist = matches[i].distance;
+     if( dist < min_dist ) min_dist = dist;
+     if( dist > max_dist ) max_dist = dist;
+   }
+
+   printf("-- Max dist : %f \n", max_dist );
+   printf("-- Min dist : %f \n", min_dist );
+
+   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+   std::vector< DMatch > good_matches;
+
+   for( int i = 0; i < descriptors_object.rows; i++ )
+   { if( matches[i].distance < 3*min_dist )
+      { good_matches.push_back( matches[i]); }
+   }
+
+
+   //-- Localize the object
+   std::vector<Point2f> obj;
+   std::vector<Point2f> scene;
+
+   for( int i = 0; i < good_matches.size(); i++ )
+   {
+     //-- Get the keypoints from the good matches
+     obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
+     scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
+   }
+
+   Mat H = findHomography( obj, scene, CV_RANSAC );
+
+
   H.convertTo(H, CV_32FC1);
   cb(true, H);
   
@@ -122,9 +103,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   for (int i=0; i < 3; i++)
     printf("%f %f %f\n", H.at<float>(i,0), H.at<float>(i,1), H.at<float>(i,2));
   */
-  
-  printf("matched %d features\n", (int)featuresSrc.size());
-}
+  }
 
 // ----------------------------------------------------------------------------------
 void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb)
@@ -135,10 +114,10 @@ void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Ma
   }
   
   // extract one channel for matching -> better have YUV, but green channel is god enough
-  cv::Mat rgbSrc[4];
-  cv::Mat rgbDst[4];
-  cv::split(imageSrc, rgbSrc);
-  cv::split(imageDst, rgbDst);
+  //cv::Mat rgbSrc[4];
+  //cv::Mat rgbDst[4];
+  //cv::split(imageSrc, rgbSrc);
+  //cv::split(imageDst, rgbDst);
     
-  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, rgbSrc[1], rgbDst[1], priorH, cb)));
+  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, imageSrc, imageDst, priorH, cb)));
 }
