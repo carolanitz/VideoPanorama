@@ -47,15 +47,16 @@
  */
 
 #import "VideoPanoramaViewController.h"
-
+#import <GLKit/GLKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "VideoPanoramaCapturePipeline.h"
-#import "OpenGLPixelBufferView.h"
+#import "VideoPanoramaAppDelegate.h"
 
-@interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate>
+@interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate, GLKViewDelegate>
 {
 	BOOL _addedObservers;
 	BOOL _recording;
+    BOOL notSetup;
 	UIBackgroundTaskIdentifier _backgroundRecordingID;
 	BOOL _allowedToUseGPU;
 }
@@ -64,7 +65,7 @@
 @property(nonatomic, retain) IBOutlet UILabel *framerateLabel;
 @property(nonatomic, retain) IBOutlet UILabel *dimensionsLabel;
 @property(nonatomic, retain) NSTimer *labelTimer;
-@property(nonatomic, retain) OpenGLPixelBufferView *previewView;
+@property(nonatomic, retain) GLKView *previewView;
 @property(nonatomic, retain) VideoPanoramaCapturePipeline *capturePipeline;
 
 @end
@@ -101,7 +102,7 @@
 	[self.capturePipeline stopRecording]; // no-op if we aren't recording
 	
 	 // We reset the OpenGLPixelBufferView to ensure all resources have been clear when going to the background.
-	[self.previewView reset];
+//	[self.previewView reset];
 }
 
 - (void)applicationWillEnterForeground
@@ -112,6 +113,7 @@
 
 - (void)viewDidLoad
 {
+    notSetup = YES;
     self.capturePipeline = [[[VideoPanoramaCapturePipeline alloc] init] autorelease];
     [self.capturePipeline setDelegate:self callbackQueue:dispatch_get_main_queue()];
 	
@@ -211,9 +213,19 @@
 - (void)setupPreviewView
 {
     // Set up GL view
-    self.previewView = [[[OpenGLPixelBufferView alloc] initWithFrame:CGRectZero] autorelease];
+    self.previewView = [GLKView new];
+    EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+    self.previewView.context = context;
+    self.previewView.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+    self.previewView.delegate = self;
+    self.previewView.enableSetNeedsDisplay = false;
+
+    EAGLContext.currentContext = context;
 	self.previewView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-	
+
+
+    self.previewView.delegate = self;
+
 	UIInterfaceOrientation currentInterfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
     self.previewView.transform = [self.capturePipeline transformFromVideoBufferOrientationToOrientation:(AVCaptureVideoOrientation)currentInterfaceOrientation withAutoMirroring:YES]; // Front camera preview should be mirrored
 
@@ -222,6 +234,15 @@
     bounds.size = [self.view convertRect:self.view.bounds toView:self.previewView].size;
     self.previewView.bounds = bounds;
     self.previewView.center = CGPointMake(self.view.bounds.size.width/2.0, self.view.bounds.size.height/2.0);	
+}
+
+-(void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+{
+    if(notSetup) {
+        [VideoPanoramaAppDelegate sharedDelegate].getMatcher->setupOpenGL(417, 736);
+        notSetup = NO;
+    }
+    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->draw();
 }
 
 - (void)deviceOrientationDidChange
@@ -273,8 +294,9 @@
 	if ( ! self.previewView ) {
 		[self setupPreviewView];
 	}
-	
-	[self.previewView displayPixelBuffer:previewPixelBuffer];
+    
+    [self.previewView display];
+	//[self.previewView displayPixelBuffer:previewPixelBuffer];
 }
 
 - (void)capturePipelineDidRunOutOfPreviewBuffers:(VideoPanoramaCapturePipeline *)capturePipeline

@@ -1,15 +1,18 @@
 #ifndef VIDEO_PANORAMA_MATCHER_PAINTER_HPP
 #define VIDEO_PANORAMA_MATCHER_PAINTER_HPP
 
-#include <array>
 #include <mutex>
 
 #include <opencv2/core/core.hpp>
 
-
+#if TARGET_IPHONE_SIMULATOR
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 #include <GL/glext.h>
+#else
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
+#endif
 
 class Painter {
 

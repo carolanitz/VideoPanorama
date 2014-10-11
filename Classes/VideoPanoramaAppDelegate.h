@@ -1,6 +1,6 @@
 
 /*
-     File: VideoPanoramaAppDelegate.m
+     File: VideoPanoramaAppDelegate.h
  Abstract: Application delegate
   Version: 2.1
  
@@ -46,14 +46,18 @@
  
  */
 
-#import "VideoPanoramaAppDelegate.h"
 
-@implementation VideoPanoramaAppDelegate
+#import <UIKit/UIKit.h>
+#import "matcher.hpp"
 
-- (void)dealloc
-{
-    [_window release];
-    [super dealloc];
+@interface VideoPanoramaAppDelegate : UIResponder <UIApplicationDelegate>{
+    Matcher matcher;
 }
+
++ (instancetype)sharedDelegate;
+
+@property(nonatomic, retain) UIWindow *window;
+
+-(Matcher *)getMatcher;
 
 @end
