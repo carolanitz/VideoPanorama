@@ -1,4 +1,5 @@
 #include "slowmatcher.hpp"
+#include "utils.hpp"
 
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -20,6 +21,7 @@ QualityMatcher::~QualityMatcher()
     m_matchingThread->join();
   }
 }
+
 
 // ----------------------------------------------------------------------------------
 void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb)
@@ -47,7 +49,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::FAST(imgSrc, featuresSrc, 40, cv::FastFeatureDetector::TYPE_9_16);
   cv::FAST(imgDst, featuresDst, 40, cv::FastFeatureDetector::TYPE_9_16);
   
-  printf("input %d vs %d\n", featuresSrc.size(), featuresDst.size());
+  printf("input %d vs %d\n", (int)featuresSrc.size(), (int)featuresDst.size());
   
   // descriptors
   cv::BriefDescriptorExtractor brief;
@@ -113,12 +115,27 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::waitKey(0); */
   
   
-  cv::Mat H = priorH;
-  H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
-   
+  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
+  H.convertTo(H, CV_32FC1);
   cb(true, H);
   
-  printf("matched %d features\n", featuresSrc.size());
+  // DEBUG  
+  /*printf("H:\n");
+  for (int i=0; i < 3; i++)
+    printf("%f %f %f\n", H.at<float>(i,0), H.at<float>(i,1), H.at<float>(i,2));
+  */
+  
+/*  cv::Mat tR = utils::cameraPoseFromHomography(H);
+
+  
+  
+  
+    
+  printf("[R|t]:\n");
+  for (int i=0; i < 3; i++)
+    printf("%f %f %f %f\n", tR.at<float>(i,0), tR.at<float>(i,1), tR.at<float>(i,2), tR.at<float>(i,3));
+    */
+  printf("matched %d features\n", (int)featuresSrc.size());
 }
 
 // ----------------------------------------------------------------------------------
