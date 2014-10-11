@@ -169,24 +169,27 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
 void Matcher::matched1to2(bool valid, cv::Mat H)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  if (!valid) return;
-  
-  H = H.inv();
-  H.convertTo(m_H_1to2, CV_32FC1); // float
   
   m_matcherAvalable = true;  
   m_tracking = true;
+  
+  if (!valid) return;
+  
+  H = H.inv();
+  H.convertTo(m_H_1to2, CV_32FC1); // float  
 }
 
 // ----------------------------------------------------------------------------------
 void Matcher::matched2to1(bool valid, cv::Mat H)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
+  
+  m_matcherAvalable = true;  
+  m_tracking = true;
+  
   if (!valid) return;
 
   H.convertTo(m_H_1to2, CV_32FC1); // float
   
-  m_matcherAvalable = true;  
-  m_tracking = true;
 }
 

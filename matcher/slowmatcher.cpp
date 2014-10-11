@@ -65,7 +65,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   }
   
   // matching (simple nearest neighbours)
-  cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20,10,4));
+  cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20, 10, 4));
   std::vector< cv::DMatch > matches;
   matcher.match( descriptorsSrc, descriptorsDst, matches );
   
@@ -80,11 +80,13 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   std::vector<cv::Point2f> ptsSrc, ptsDst;
   for( int i = 0; i < matches.size(); i++ )
   {
-    //if( matches[i].distance <= std::max(2. * min_dist, 0.02) )
+    if( matches[i].distance <= 15)//std::max(4. * min_dist, 0.02) )
     {
       goodMatches.push_back(matches[i]);
     }
   }
+  printf("min = %f - %d\n", min_dist, goodMatches.size());
+  
   for( int i = 0; i < goodMatches.size(); i++ )
   {
     ptsSrc.push_back( featuresSrc[ goodMatches[i].queryIdx ].pt );
@@ -93,17 +95,10 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   
   if (goodMatches.size() < 10)
   {
+    printf("MATCH FAILED\n");
     cb(false, priorH);
     return;
   }
-  
-  
-  /*for (cv::Point2f& pt : ptsSrc)
-    cv::circle(imgSrc, pt, 5, cv::Scalar(255,0,255));
-  
-  for (cv::Point2f& pt : ptsDst)
-    cv::circle(imgDst, pt, 5, cv::Scalar(255,0,255));
-  */
   
   /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
   cv::Mat img;
@@ -115,7 +110,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::waitKey(0); */
   
   
-  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
+  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC);
   H.convertTo(H, CV_32FC1);
   cb(true, H);
   
@@ -125,16 +120,6 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
     printf("%f %f %f\n", H.at<float>(i,0), H.at<float>(i,1), H.at<float>(i,2));
   */
   
-/*  cv::Mat tR = utils::cameraPoseFromHomography(H);
-
-  
-  
-  
-    
-  printf("[R|t]:\n");
-  for (int i=0; i < 3; i++)
-    printf("%f %f %f %f\n", tR.at<float>(i,0), tR.at<float>(i,1), tR.at<float>(i,2), tR.at<float>(i,3));
-    */
   printf("matched %d features\n", (int)featuresSrc.size());
 }
 
