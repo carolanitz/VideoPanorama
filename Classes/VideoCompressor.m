@@ -39,6 +39,8 @@ static void outputCallback (void *outputCallbackRefCon,
                                                      nil, //Output Callback
                                                      &session);
         NSLog(@"Created Session: Status is %d", (int)status);
+        VTSessionSetProperty(session, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
+        VTSessionSetProperty(session, kVTCompressionPropertyKey_AllowFrameReordering, kCFBooleanFalse);
         self.session = session;
         VTCompressionSessionPrepareToEncodeFrames(self.session);
     }
@@ -46,6 +48,7 @@ static void outputCallback (void *outputCallbackRefCon,
 }
 
 - (void)dealloc {
+    VTCompressionSessionCompleteFrames(self.session, kCMTimeInvalid);
     VTCompressionSessionInvalidate(self.session);
     CFRelease(self.session);
     [super dealloc];
