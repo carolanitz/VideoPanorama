@@ -64,7 +64,7 @@
 		41F775AB19E9457E00F0F4C4 /* slowmatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = slowmatcher.hpp; sourceTree = "<group>"; };
 		5DBA2A9819C232E200530F7A /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = Resources/en.lproj/Launch.storyboard; sourceTree = SOURCE_ROOT; };
 		5DC09BED19B7F1A70025A16E /* VideoPanoramaRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = VideoPanoramaRenderer.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		696D282919CA539900A23D81 /* RosyWriterOpenCV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RosyWriterOpenCV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		696D282919CA539900A23D81 /* VideoPanorama.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoPanorama.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F096BF9157ED5110075E328 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		6F90DDD91395CAAA00125BDA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		6F90DDDB1395CAAA00125BDA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -172,7 +172,7 @@
 		6F90DDD61395CAAA00125BDA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				696D282919CA539900A23D81 /* RosyWriterOpenCV.app */,
+				696D282919CA539900A23D81 /* VideoPanorama.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -287,7 +287,7 @@
 			);
 			name = VideoPanorama1OpenCV;
 			productName = RosyWriter;
-			productReference = 696D282919CA539900A23D81 /* RosyWriterOpenCV.app */;
+			productReference = 696D282919CA539900A23D81 /* VideoPanorama.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -345,7 +345,6 @@
 				41F775B019E9457E00F0F4C4 /* painter.cpp in Sources */,
 				41F775B119E9457E00F0F4C4 /* slowmatcher.cpp in Sources */,
 				696D281119CA539900A23D81 /* MovieRecorder.m in Sources */,
-				696D281219CA539900A23D81 /* OpenGLPixelBufferView.m in Sources */,
 				8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */,
 				696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */,
 				41F775AD19E9457E00F0F4C4 /* fastmatcher.cpp in Sources */,
@@ -406,7 +405,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = "-DUSE_OPENCV_RENDERER=1";
-				PRODUCT_NAME = RosyWriterOpenCV;
+				PRODUCT_NAME = VideoPanorama;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Classes/VideoPanorama1OpenCV-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -438,7 +437,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_CFLAGS = "-DUSE_OPENCV_RENDERER=1";
-				PRODUCT_NAME = RosyWriterOpenCV;
+				PRODUCT_NAME = VideoPanorama;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Classes/VideoPanorama1OpenCV-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
