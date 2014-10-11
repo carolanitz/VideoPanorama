@@ -29,14 +29,14 @@ void Matcher::draw()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   
-  // Thread safe
   m_painter.draw();
 }
 
 // ----------------------------------------------------------------------------------
 void Matcher::cleanupOpenGL()
 {
-  // Thread safe
+  std::lock_guard<std::mutex> lock(m_mutex);
+  
   m_painter.cleanupOpenGL ();
 }
 

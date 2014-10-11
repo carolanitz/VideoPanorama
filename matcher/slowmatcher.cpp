@@ -52,7 +52,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
   brief.compute(imgDst, featuresDst, descriptorsDst);
   
-  if (featuresDst.size() == 0 || featuresSrc.size() == 0
+  if (featuresDst.size() < 10 || featuresSrc.size() < 10
       || descriptorsSrc.rows != featuresSrc.size()
       || descriptorsDst.rows != featuresDst.size())
   {
@@ -66,27 +66,51 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   matcher.match( descriptorsSrc, descriptorsDst, matches );
   
   // extract good matches  
+  float min_dist = FLT_MAX;
+  for( size_t i = 0; i < featuresSrc.size(); i++ )
+  { 
+    min_dist = std::min(min_dist, matches[i].distance);
+  }
+  
+  std::vector< cv::DMatch > goodMatches;
   std::vector<cv::Point2f> ptsSrc, ptsDst;
   for( int i = 0; i < matches.size(); i++ )
   {
-    ptsSrc.push_back( featuresSrc[ matches[i].queryIdx ].pt );
-    ptsDst.push_back( featuresDst[ matches[i].trainIdx ].pt );
+    if( matches[i].distance <= std::max(3. * min_dist, 0.02) )
+    {
+      goodMatches.push_back(matches[i]);
+    }
+  }
+  for( int i = 0; i < goodMatches.size(); i++ )
+  {
+    ptsSrc.push_back( featuresSrc[ goodMatches[i].queryIdx ].pt );
+    ptsDst.push_back( featuresDst[ goodMatches[i].trainIdx ].pt );
+  }
+  
+  if (goodMatches.size() < 10)
+  {
+    cb(false, priorH);
+    return;
   }
   
   
-  cv::Mat H = priorH;
-  
-  for (cv::Point2f& pt : ptsSrc)
+  /*for (cv::Point2f& pt : ptsSrc)
     cv::circle(imgSrc, pt, 5, cv::Scalar(255,0,255));
   
   for (cv::Point2f& pt : ptsDst)
     cv::circle(imgDst, pt, 5, cv::Scalar(255,0,255));
   
-  /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
-  cv::imshow("imgae1", imgSrc);
-  cv::imshow("imgae2", imgDst);
-  cv::waitKey(0); */
+  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
+  cv::Mat img;
+  cv::drawMatches(imgSrc, featuresSrc, imgDst, featuresDst, matches, img);
+  cv::imshow("imgae1", img);
   
+  //cv::imshow("imgae1", imgSrc);
+  //cv::imshow("imgae2", imgDst);
+  cv::waitKey(0); 
+  */
+  
+  cv::Mat H = priorH;
   H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 5.0);
   
   cb(true, H);
