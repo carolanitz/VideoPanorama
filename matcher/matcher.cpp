@@ -8,7 +8,7 @@
 #include <functional>
 #include <iostream>
 
-#define DEBUG_SENSORS
+//#define DEBUG_SENSORS
 
 // ----------------------------------------------------------------------------------
 Matcher::Matcher()
