@@ -50,6 +50,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     }
     
     func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
+        self.capturePipeline.startRunning()
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary
         self.capturePipeline.videoDevice.lockForConfiguration(nil)
@@ -57,6 +58,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         var whiteBalanceGain:AVCaptureWhiteBalanceGains = AVCaptureWhiteBalanceGains(redGain: 0,greenGain: 0,blueGain: 0)
         whiteBalanceGainData.getBytes(&whiteBalanceGain, length: sizeof(AVCaptureWhiteBalanceGains))
         self.capturePipeline.videoDevice.setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains(whiteBalanceGain, completionHandler: nil)
+        self.capturePipeline.videoDevice.unlockForConfiguration()
 
 
     }

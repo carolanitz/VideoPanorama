@@ -26,57 +26,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Classes/ConnectedVideoPanoramaViewController.swift"
-            timestampString = "434737225.985596"
+            timestampString = "434737526.172005"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "59"
-            endingLineNumber = "59"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
             landmarkName = "session(_:didReceiveData:fromPeer:)"
             landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "VideoPanorama.ConnectedVideoPanoramaViewController.session (VideoPanorama.ConnectedVideoPanoramaViewController)(Swift.ImplicitlyUnwrappedOptional&lt;ObjectiveC.MCSession&gt;, didReceiveData : Swift.ImplicitlyUnwrappedOptional&lt;ObjectiveC.NSData&gt;, fromPeer : Swift.ImplicitlyUnwrappedOptional&lt;ObjectiveC.MCPeerID&gt;) -&gt; ()"
-                  moduleName = "VideoPanorama"
-                  urlString = "file:///Users/Caro/Documents/projects/VideoPanorama/Classes/ConnectedVideoPanoramaViewController.swift"
-                  timestampString = "434737239.439995"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "59"
-                  endingLineNumber = "59"
-                  offsetFromSymbolStart = "1396">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "reabstraction thunk helper from @callee_owned (@in C.CMTime) -&gt; (@out ()) to @callee_owned (@unowned C.CMTime) -&gt; (@unowned ())"
-                  moduleName = "VideoPanorama"
-                  urlString = "file:///Users/Caro/Documents/projects/VideoPanorama/Classes/ConnectedVideoPanoramaViewController.swift"
-                  timestampString = "434737239.440182"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "59"
-                  endingLineNumber = "59"
-                  offsetFromSymbolStart = "32">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "reabstraction thunk helper from @callee_owned (@unowned C.CMTime) -&gt; (@unowned ()) to @callee_unowned @objc_block (@unowned C.CMTime) -&gt; (@unowned ())"
-                  moduleName = "VideoPanorama"
-                  urlString = "file:///Users/Caro/Documents/projects/VideoPanorama/Classes/ConnectedVideoPanoramaViewController.swift"
-                  timestampString = "434737239.440309"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "59"
-                  endingLineNumber = "59"
-                  offsetFromSymbolStart = "76">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
