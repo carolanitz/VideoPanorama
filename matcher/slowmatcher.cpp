@@ -126,8 +126,8 @@ void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Ma
   }
   
   // extract one channel for matching -> better have YUV, but green channel is god enough
-  cv::Mat rgbSrc[3];
-  cv::Mat rgbDst[3];
+  cv::Mat rgbSrc[4];
+  cv::Mat rgbDst[4];
   cv::split(imageSrc, rgbSrc);
   cv::split(imageDst, rgbDst);
     
