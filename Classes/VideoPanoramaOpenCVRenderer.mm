@@ -100,12 +100,11 @@
 	// Use extendedWidth instead of width to account for possible row extensions (sometimes used for memory alignment).
 	// We only need to work on columms from [0, width - 1] regardless.
 	
-   if (!isSender && canSend)
+   if (!isSender)
    {
       [networkSession sendData:[NSData dataWithBytes:base length:height*stride] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
-      canSend = false;
    }
-   
+   else
    {
 	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
     cv::Vec4f motionvector;

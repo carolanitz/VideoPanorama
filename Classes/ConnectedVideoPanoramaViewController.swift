@@ -15,8 +15,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     let serviceType = "VideoPanorama"
     var peerID: MCPeerID
     var advertiser: MCAdvertiserAssistant
-   var first = true
-   
+    
     required init(coder aDecoder: NSCoder) {
         peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
         networkSession = MCSession(peer: peerID)
@@ -55,20 +54,9 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
       {
          println("GOt HUUUUGE Data");
          sendDataToMatcher(data);
-         networkSession.sendData(nil, toPeers: networkSession.connectedPeers, withMode: .Reliable, error: nil);
-
       }
       else
       {
-         if (!first)
-         {
-            canSend = true;
-         }
-         else
-         {
-            first = false;
-         }
-         
         self.capturePipeline.startRunning()
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary

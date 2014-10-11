@@ -12,7 +12,6 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 
 extern BOOL isSender;
-extern BOOL canSend;
 extern MCSession *networkSession;
 
 #endif

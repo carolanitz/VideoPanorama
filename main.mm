@@ -53,7 +53,6 @@
 int main(int argc, char *argv[])
 {
    isSender = false;
-   canSend = true;
 
 	int retVal = 0;
 	@autoreleasepool {
