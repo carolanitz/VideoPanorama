@@ -54,4 +54,5 @@
 
 @property(nonatomic, retain) VideoPanoramaCapturePipeline *capturePipeline;
 
+-(void) sendDataToMatcher: (NSData *)data;
 @end

@@ -53,7 +53,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
       if (isSender)
       {
          println("GOt HUUUUGE Data");
-      
+         sendDataToMatcher(data);
       }
       else
       {

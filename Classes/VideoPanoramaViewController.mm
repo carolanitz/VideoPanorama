@@ -328,4 +328,10 @@
 	[self showError:error];
 }
 
+-(void) sendDataToMatcher: (NSData *)data
+{
+   cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC1, (unsigned char*)data.bytes);
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(), 0);
+}
+
 @end
