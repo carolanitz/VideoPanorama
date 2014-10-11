@@ -251,37 +251,7 @@ void Painter::draw()
 
   glActiveTexture(GL_TEXTURE0);
 
-   if (!m_image1.empty())
-   {
-      glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-      GL_CHECK();
-      
-      if (m_texture1Created)
-      {
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image1.size().width, m_image1.size().height, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
-         GL_CHECK();
-      }
-      else
-      {
-         glTexImage2D(GL_TEXTURE_2D, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, m_image1.size().width, m_image1.size().height, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
-         
-         GL_CHECK();
-         
-         m_texture1Created = true;
-      }
-      
-      GLint location = glGetUniformLocation(m_shaderProgram, "H");
-      if (location == -1)
-      {
-      }
-      else
-      {
-         glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)convert(m_H1, m_image1.size().width, m_image1.size().height).data);
-      }
-      
-      // Draw a rectangle from the 2 triangles using 6 indices
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-   }
+   
    
    if (!m_image2.empty())
    {
@@ -313,6 +283,38 @@ void Painter::draw()
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
    }
    
+   
+   if (!m_image1.empty())
+   {
+      glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+      GL_CHECK();
+      
+      if (m_texture1Created)
+      {
+         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image1.size().width, m_image1.size().height, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
+         GL_CHECK();
+      }
+      else
+      {
+         glTexImage2D(GL_TEXTURE_2D, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, m_image1.size().width, m_image1.size().height, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
+         
+         GL_CHECK();
+         
+         m_texture1Created = true;
+      }
+      
+      GLint location = glGetUniformLocation(m_shaderProgram, "H");
+      if (location == -1)
+      {
+      }
+      else
+      {
+         glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)convert(m_H1, m_image1.size().width, m_image1.size().height).data);
+      }
+      
+      // Draw a rectangle from the 2 triangles using 6 indices
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+   }
 
 
   GL_CHECK();

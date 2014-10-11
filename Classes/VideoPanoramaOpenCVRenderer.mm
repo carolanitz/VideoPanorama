@@ -111,7 +111,7 @@
       cv::imencode(".jpg", bgraImage, buffer, params);
       [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
    }
-   else
+
    {
     cv::Vec4f motionvector;
     motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
