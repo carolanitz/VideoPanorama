@@ -5,3 +5,4 @@
 #import "VideoPanoramaViewController.h"
 #import "VideoCompressor.h"
 #import "VideoPanoramaCapturePipeline.h"
+#import "VideoDecompressor.h"

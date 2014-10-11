@@ -19,4 +19,5 @@
 
 - (void)encodeFrame:(CMSampleBufferRef)sampleBuffer;
 
+
 @end

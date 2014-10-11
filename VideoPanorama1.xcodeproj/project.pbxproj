@@ -41,6 +41,7 @@
 		696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1FCCE63019B92B1B009D7A6B /* VideoPanoramaOpenCVRenderer.mm */; };
 		8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */; };
 		8298D0ED19E9612700B4A98F /* VideoCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8298D0EC19E9612700B4A98F /* VideoCompressor.m */; };
+		8298D0F219E994C300B4A98F /* VideoDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8298D0F119E994C300B4A98F /* VideoDecompressor.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +101,8 @@
 		8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectedVideoPanoramaViewController.swift; sourceTree = "<group>"; };
 		8298D0EB19E9612700B4A98F /* VideoCompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoCompressor.h; sourceTree = "<group>"; };
 		8298D0EC19E9612700B4A98F /* VideoCompressor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoCompressor.m; sourceTree = "<group>"; };
+		8298D0F019E994C300B4A98F /* VideoDecompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoDecompressor.h; sourceTree = "<group>"; };
+		8298D0F119E994C300B4A98F /* VideoDecompressor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoDecompressor.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +232,8 @@
 				6F90DDE91395CAAA00125BDA /* VideoPanoramaAppDelegate.mm */,
 				8298D0EB19E9612700B4A98F /* VideoCompressor.h */,
 				8298D0EC19E9612700B4A98F /* VideoCompressor.m */,
+				8298D0F019E994C300B4A98F /* VideoDecompressor.h */,
+				8298D0F119E994C300B4A98F /* VideoDecompressor.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -355,6 +360,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				696D280B19CA539900A23D81 /* main.mm in Sources */,
+				8298D0F219E994C300B4A98F /* VideoDecompressor.m in Sources */,
 				696D280C19CA539900A23D81 /* VideoPanoramaAppDelegate.mm in Sources */,
 				696D280D19CA539900A23D81 /* VideoPanoramaViewController.mm in Sources */,
 				696D280F19CA539900A23D81 /* VideoPanoramaCapturePipeline.m in Sources */,

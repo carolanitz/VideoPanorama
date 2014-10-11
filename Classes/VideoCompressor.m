@@ -18,8 +18,9 @@ static void outputCallback (void *outputCallbackRefCon,
                             VTEncodeInfoFlags infoFlags,
                             CMSampleBufferRef sampleBuffer);
 
-@interface VideoCompressor ()
+@interface VideoCompressor () <NSStreamDelegate>
 @property VTCompressionSessionRef session;
+@property NSData *frameDataToSend;
 @end
 
 @implementation VideoCompressor
@@ -28,7 +29,10 @@ static void outputCallback (void *outputCallbackRefCon,
 {
     self = [super init];
     if (self) {
-        _stream = stream;
+        _stream = [stream retain];
+        _stream.delegate = self;
+        [_stream scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+        [_stream open];
         
         VTCompressionSessionRef session;
         
@@ -68,6 +72,20 @@ static void outputCallback (void *outputCallbackRefCon,
                                     NULL);
 }
 
+- (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode {
+    if (eventCode == NSStreamEventHasSpaceAvailable) {
+        [self writeDataIfSpaceAvailable];
+    }
+}
+
+- (void)writeDataIfSpaceAvailable {
+    if (self.frameDataToSend && self.stream.hasSpaceAvailable) {
+        NSInteger bytesWritten = [self.stream write:self.frameDataToSend.bytes maxLength:self.frameDataToSend.length];
+        NSLog(@"Sent %d bytes of %d", bytesWritten, self.frameDataToSend.length);
+        self.frameDataToSend = nil;
+    }
+}
+
 @end
 
 static void outputCallback (void *outputCallbackRefCon,
@@ -93,6 +111,8 @@ static void outputCallback (void *outputCallbackRefCon,
     NSDictionary *dict = @{@"format": [NSData dataWithBytes:formatData length:formatLength],
                            @"data": [NSData dataWithBytes:dataData length:dataLength],
                            @"time": [(NSDictionary *)CMTimeCopyAsDictionary(time, NULL) autorelease]};
-    NSData *dataWeActuallySend = [NSKeyedArchiver archivedDataWithRootObject:dict];
-    [compressor.stream write:dataWeActuallySend.bytes maxLength:dataWeActuallySend.length];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        compressor.frameDataToSend = [NSKeyedArchiver archivedDataWithRootObject:dict];
+        [compressor writeDataIfSpaceAvailable];
+    });
 }

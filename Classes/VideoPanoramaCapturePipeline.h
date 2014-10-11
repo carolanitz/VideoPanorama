@@ -49,6 +49,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import "VideoCompressor.h"
+#import "VideoDecompressor.h"
 
 @protocol VideoPanoramaCapturePipelineDelegate;
 
@@ -75,7 +76,8 @@
 @property(readonly) float videoFrameRate;
 @property(readonly) CMVideoDimensions videoDimensions;
 
-@property (strong) VideoCompressor *compressor;
+@property (retain) VideoCompressor *compressor;
+@property (retain) VideoDecompressor *decompressor;
 
 @end
 
