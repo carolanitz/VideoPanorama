@@ -57,12 +57,12 @@ void Painter::updateImage2(cv::Mat image)
 
 void Painter::updateHomography1(cv::Mat H)
 {
-//  m_H1 = H;
+  m_H1 = H;
 }
 
 void Painter::updateHomography2(cv::Mat H)
 {
-//  m_H2 = H;
+  m_H2 = H;
 }
 
 void _check_gl_error(const char* file, int line) {
