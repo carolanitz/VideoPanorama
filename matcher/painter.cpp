@@ -151,7 +151,6 @@ void Painter::setupOpenGL(int w, int h)
   GLuint shaderProgram = glCreateProgram();
   glAttachShader(shaderProgram, vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
-  glBindFragDataLocation(shaderProgram, 0, "outColor");
   glLinkProgram(shaderProgram);
 
 
@@ -192,10 +191,6 @@ void Painter::setupOpenGL(int w, int h)
 
   // Load textures
   glGenTextures(2, m_textures);
-
-  int width, height;
-  unsigned char* image;
-
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_textures[0]);
