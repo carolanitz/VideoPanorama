@@ -13,7 +13,9 @@ set(SOURCES
   slowmatcher.cpp
   slowmatcher.hpp
   painter.hpp
-  painter.cpp)
+  painter.cpp
+  utils.hpp
+  utils.cpp)
 
 #add_definitions(-DTARGET_IPHONE_SIMULATOR)
 add_definitions(-DTARGET_DACUDAS_LINUX_BUILD_SERVER_PLEASE_RENAME)
@@ -23,6 +25,7 @@ add_executable(matcher ${SOURCES})
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem system thread)
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(3rdparty/eigen3)
 target_link_libraries(matcher ${Boost_LIBRARIES})
 target_link_libraries(matcher ${OpenCV_LIBS})
 

@@ -18,6 +18,8 @@ public:
 
 private:
 
+  cv::Mat cameraPoseFromHomography(const cv::Mat& H);
+  
   MatchingResultCallback m_matchResultCallback;
 
   std::shared_ptr<std::thread> m_matchingThread;
