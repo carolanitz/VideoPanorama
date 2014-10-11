@@ -7,6 +7,8 @@
 //
 
 @import VideoToolbox;
+@import CoreMedia;
+@import AVFoundation;
 
 #import "VideoCompressor.h"
 
@@ -71,5 +73,24 @@ static void outputCallback (void *outputCallbackRefCon,
                             OSStatus status,
                             VTEncodeInfoFlags infoFlags,
                             CMSampleBufferRef sampleBuffer) {
-    NSLog(@"Got some Output");
+    VideoCompressor *compressor = sourceFrameRefCon;
+    CMBlockBufferRef formatBuffer = NULL;
+    CMVideoFormatDescriptionCopyAsBigEndianImageDescriptionBlockBuffer(NULL,
+                                                                       CMSampleBufferGetFormatDescription(sampleBuffer),
+                                                                       CFStringGetSystemEncoding(),
+                                                                       NULL,
+                                                                       &formatBuffer);
+    size_t formatLength;
+    char* formatData;
+    CMBlockBufferGetDataPointer(formatBuffer, 0, NULL, &formatLength, &formatData);
+    CMTime time = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
+    CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
+    size_t dataLength;
+    char* dataData; //haha
+    CMBlockBufferGetDataPointer(dataBuffer, 0, NULL, &dataLength, &dataData);
+    NSDictionary *dict = @{@"format": [NSData dataWithBytesNoCopy:formatData length:formatLength],
+                           @"data": [NSData dataWithBytesNoCopy:dataData length:dataLength],
+                           @"time": [NSValue valueWithCMTime:time]};
+    NSData *dataWeActuallySend = [NSKeyedArchiver archivedDataWithRootObject:dict];
+    [compressor.stream write:dataWeActuallySend.bytes maxLength:dataWeActuallySend.length];
 }
