@@ -40,21 +40,24 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::Mat descriptorsSrc, descriptorsDst;
   
   // detect
-  /*cv::ORB detector(200,1.5f,6);
-  detector.compute(imgSrc, cv::Mat(), featuresSrc, descriptorsSrc);
-  detector.compute(imgDst, cv::Mat(), featuresDst, descriptorsDst);
-  */
+  
+  //cv::Ptr<cv::FeatureDetector> detector = cv::FeatureDetector::create("ORB");
+  cv::Ptr<cv::DescriptorExtractor> descriptor = cv::DescriptorExtractor::create("ORB" );
+  //detector->detect(imgSrc, featuresSrc);
+  //detector->detect(imgDst, featuresDst);
   
   // features
   cv::FAST(imgSrc, featuresSrc, 40, cv::FastFeatureDetector::TYPE_9_16);
   cv::FAST(imgDst, featuresDst, 40, cv::FastFeatureDetector::TYPE_9_16);
   
   printf("input %d vs %d\n", (int)featuresSrc.size(), (int)featuresDst.size());
+  descriptor->compute(imgSrc, featuresSrc, descriptorsSrc);
+  descriptor->compute(imgDst, featuresDst, descriptorsDst);
   
   // descriptors
-  cv::BriefDescriptorExtractor brief;
-  brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
-  brief.compute(imgDst, featuresDst, descriptorsDst);
+  //cv::BriefDescriptorExtractor brief;
+  //brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
+  //brief.compute(imgDst, featuresDst, descriptorsDst);
   
   if (featuresDst.size() < 10 || featuresSrc.size() < 10
       || descriptorsSrc.rows != featuresSrc.size()
@@ -65,7 +68,8 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   }
   
   // matching (simple nearest neighbours)
-  cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20, 10, 4));
+  cv::BFMatcher matcher(cv::NORM_HAMMING);
+  //cv::FlannBasedMatcher matcher(new cv::flann::LshIndexParams(20, 10, 4));
   std::vector< cv::DMatch > matches;
   matcher.match( descriptorsSrc, descriptorsDst, matches );
   
