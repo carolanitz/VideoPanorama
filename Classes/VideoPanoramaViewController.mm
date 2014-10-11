@@ -61,7 +61,6 @@
 	BOOL _allowedToUseGPU;
 }
 
-@property(nonatomic, retain) IBOutlet UIBarButtonItem *recordButton;
 @property(nonatomic, retain) IBOutlet UILabel *framerateLabel;
 @property(nonatomic, retain) IBOutlet UILabel *dimensionsLabel;
 @property(nonatomic, retain) NSTimer *labelTimer;
@@ -80,7 +79,6 @@
 		[[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 	}
 
-	[_recordButton release];
 	[_framerateLabel release];
 	[_dimensionsLabel release];
 	[_labelTimer release];
@@ -187,10 +185,7 @@
 		if ( [[UIDevice currentDevice] isMultitaskingSupported] ) {
 			_backgroundRecordingID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
 		}
-		
-		self.recordButton.enabled = NO; // re-enabled once recording has finished starting
-		self.recordButton.title = @"Stop";
-		
+
 		[self.capturePipeline startRecording];
 		
 		_recording = YES;
@@ -200,8 +195,6 @@
 - (void)recordingStopped
 {
 	_recording = NO;
-	self.recordButton.enabled = YES;
-	self.recordButton.title = @"Record";
 	
 	[UIApplication sharedApplication].idleTimerDisabled = NO;
 	
@@ -279,8 +272,7 @@
 - (void)capturePipeline:(VideoPanoramaCapturePipeline *)capturePipeline didStopRunningWithError:(NSError *)error
 {
 	[self showError:error];
-	
-	self.recordButton.enabled = NO;
+
 }
 
 // Preview
@@ -295,28 +287,10 @@
 	}
     
     [self.previewView display];
-	//[self.previewView displayPixelBuffer:previewPixelBuffer];
-}
-
-- (void)capturePipelineDidRunOutOfPreviewBuffers:(VideoPanoramaCapturePipeline *)capturePipeline
-{
-	if ( _allowedToUseGPU ) {
-		[self.previewView flushPixelBufferCache];
-	}
 }
 
 // Recording
-- (void)capturePipelineRecordingDidStart:(VideoPanoramaCapturePipeline *)capturePipeline
-{
-	self.recordButton.enabled = YES;
-}
 
-- (void)capturePipelineRecordingWillStop:(VideoPanoramaCapturePipeline *)capturePipeline
-{
-	// Disable record button until we are ready to start another recording
-	self.recordButton.enabled = NO;
-	self.recordButton.title = @"Record";
-}
 
 - (void)capturePipelineRecordingDidStop:(VideoPanoramaCapturePipeline *)capturePipeline
 {
