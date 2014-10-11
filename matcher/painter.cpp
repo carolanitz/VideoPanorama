@@ -1,29 +1,27 @@
 #include "painter.hpp"
 
 // Shader sources
-const GLchar* vertexSource =
-    "#version 300 es\n"
-    "in vec2 position;"
-    "in vec3 color;"
-    "in vec2 texcoord;"
-    "out vec3 Color;"
-    "out vec2 Texcoord;"
-    "void main() {"
-    "   Color = color;"
-    "   Texcoord = texcoord;"
-    "   gl_Position = vec4(position, 0.0, 1.0);"
-    "}";
-const GLchar* fragmentSource =
-    "#version 300 es\n"
-    "precision mediump float;"
-    "in vec3 Color;"
-    "in vec2 Texcoord;"
-    "out vec4 outColor;"
-    "uniform sampler2D texKitten;"
-    "uniform sampler2D texPuppy;"
-    "void main() {"
-    "   outColor = mix(texture(texKitten, Texcoord), texture(texPuppy, Texcoord), 0.5);"
-    "}";
+const GLchar* vertexSource = R"(
+    #version 300 es
+    in vec2 position;
+    in vec2 texcoord;
+    out vec2 Texcoord;
+    void main() {
+      Texcoord = texcoord;
+      gl_Position = vec4(position, 0.0, 1.0);
+    }
+)";
+const GLchar* fragmentSource = R"(
+    #version 300 es
+    precision mediump float;
+    in vec2 Texcoord;
+    out vec4 outColor;
+    uniform sampler2D image1;
+    uniform sampler2D image2;
+    void main() {
+       outColor = mix(texture(image1, Texcoord), texture(image2, Texcoord), 0.5);
+    }
+)";
 
 
 Painter::Painter()
@@ -81,11 +79,11 @@ void Painter::setupOpenGL(int w, int h)
   glGenBuffers(1, &vbo);
 
   GLfloat vertices[] = {
-    //  Position   Color             Texcoords
-    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
-    0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
-    0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
-    -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
+    // Position   Texcoords
+    -0.5f,  0.5f, 0.0f, 0.0f, // Top-left
+     0.5f,  0.5f, 1.0f, 0.0f, // Top-right
+     0.5f, -0.5f, 1.0f, 1.0f, // Bottom-right
+    -0.5f, -0.5f, 0.0f, 1.0f  // Bottom-left
   };
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -116,14 +114,14 @@ void Painter::setupOpenGL(int w, int h)
 
   if (status == GL_FALSE)
   {
-      GLint infoLogLength;
-      glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+    GLint infoLogLength;
+    glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-      GLchar* strInfoLog = new GLchar[infoLogLength + 1];
-      glGetShaderInfoLog(vertexShader, infoLogLength, NULL, strInfoLog);
+    GLchar* strInfoLog = new GLchar[infoLogLength + 1];
+    glGetShaderInfoLog(vertexShader, infoLogLength, NULL, strInfoLog);
 
-      printf("Compilation error in shader: %s\n", strInfoLog);
-      delete[] strInfoLog;
+    printf("Compilation error in shader: %s\n", strInfoLog);
+    delete[] strInfoLog;
   }
 
   checkErrors();
@@ -137,14 +135,14 @@ void Painter::setupOpenGL(int w, int h)
 
   if (status == GL_FALSE)
   {
-      GLint infoLogLength;
-      glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+    GLint infoLogLength;
+    glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
-      GLchar* strInfoLog = new GLchar[infoLogLength + 1];
-      glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, strInfoLog);
+    GLchar* strInfoLog = new GLchar[infoLogLength + 1];
+    glGetShaderInfoLog(fragmentShader, infoLogLength, NULL, strInfoLog);
 
-      printf("Compilation error in shader: %s\n", strInfoLog);
-      delete[] strInfoLog;
+    printf("Compilation error in shader: %s\n", strInfoLog);
+    delete[] strInfoLog;
   }
 
   checkErrors();
@@ -186,15 +184,11 @@ void Painter::setupOpenGL(int w, int h)
   // Specify the layout of the vertex data
   GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
-  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), 0);
-
-  GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-  glEnableVertexAttribArray(colAttrib);
-  glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+  glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
   GLint texAttrib = glGetAttribLocation(shaderProgram, "texcoord");
   glEnableVertexAttribArray(texAttrib);
-  glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+  glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
   // Load textures
   glGenTextures(2, m_textures);
@@ -205,7 +199,7 @@ void Painter::setupOpenGL(int w, int h)
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-  glUniform1i(glGetUniformLocation(shaderProgram, "texKitten"), 0);
+  glUniform1i(glGetUniformLocation(shaderProgram, "image1"), 0);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -214,7 +208,7 @@ void Painter::setupOpenGL(int w, int h)
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_textures[1]);
-  glUniform1i(glGetUniformLocation(shaderProgram, "texPuppy"), 1);
+  glUniform1i(glGetUniformLocation(shaderProgram, "image2"), 1);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

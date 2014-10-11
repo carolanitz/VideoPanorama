@@ -16,7 +16,7 @@ void SlowMatcher::updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion)
 }
 
 
-void SlowMatcher::updateImage2(cv::Mat image, cv::Vec4f oreintationQuaternion)
+void SlowMatcher::updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion)
 {
   m_image2 = image;
 }
