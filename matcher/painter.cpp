@@ -336,5 +336,5 @@ cv::Mat Painter::convert(cv::Mat input, int width, int height)
   cv::Mat inputFloat;
   input.convertTo(inputFloat, CV_32FC1);
 
-  return textureScale * imageToTexture * inputFloat.inv() * imageToTexture.inv();
+  return imageToTexture * inputFloat.inv() * imageToTexture.inv() * textureScale;
 }
