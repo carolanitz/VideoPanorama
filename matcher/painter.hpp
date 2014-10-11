@@ -34,6 +34,8 @@ public:
 private:
   std::mutex m_mutex;
 
+  cv::Mat convert(cv::Mat input, int width, int height);
+
   cv::Mat m_image1, m_image2;
   cv::Mat m_H1;
   cv::Mat m_H2;

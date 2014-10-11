@@ -8,13 +8,9 @@ const GLchar* vertexSource = R"(
     in vec2 position;
     in vec2 texcoord;
     out vec2 Texcoord;
-    uniform mat3 H;
     void main() {
       Texcoord = texcoord;
-
-      vec3 projected = H*vec3(position, 1.0f);
-      gl_Position.xy = projected.xy / projected.z;
-      gl_Position.zw = vec2(0.0, 1.0);
+      gl_Position = vec4(position, 0.0, 1.0);
     }
 )";
 const GLchar* fragmentSource = R"(
@@ -23,16 +19,25 @@ const GLchar* fragmentSource = R"(
     in vec2 Texcoord;
     out vec4 outColor;
     uniform sampler2D image;
+    uniform mat3 H;
+
     void main() {
-       outColor = vec4(texture(image, Texcoord).bgr, 1.0);
+       vec3 newPos = H*vec3(Texcoord, 1.0);
+       vec2 newPosNormalized = newPos.xy/newPos.z;
+       if (newPosNormalized.x > 1.0 || newPosNormalized.y > 1.0 || newPosNormalized.x < 0.0 || newPosNormalized.y < 0.0)
+       {
+         discard;
+         return;
+       }
+       outColor = vec4(texture(image, newPosNormalized).bgr, 1.0);
     }
 )";
 
 
 Painter::Painter()
 {
-  m_H1 = cv::Mat3f::eye(3, 3);
-  m_H2 = cv::Mat3f::eye(3, 3);
+  m_H1 = cv::Mat::eye(3, 3, CV_32FC1);
+  m_H2 = cv::Mat::eye(3, 3, CV_32FC1);
 }
 
 Painter::~Painter()
@@ -96,10 +101,10 @@ void Painter::setupOpenGL(int w, int h)
 
   GLfloat vertices[] = {
     // Position   Texcoords
-    -0.5f,  0.5f, 0.0f, 0.0f, // Top-left
-     0.5f,  0.5f, 1.0f, 0.0f, // Top-right
-     0.5f, -0.5f, 1.0f, 1.0f, // Bottom-right
-    -0.5f, -0.5f, 0.0f, 1.0f  // Bottom-left
+    -1.0f,  1.0f, 0.0f, 0.0f, // Top-left
+     1.0f,  1.0f, 1.0f, 0.0f, // Top-right
+     1.0f, -1.0f, 1.0f, 1.0f, // Bottom-right
+    -1.0f, -1.0f, 0.0f, 1.0f  // Bottom-left
   };
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -268,12 +273,10 @@ void Painter::draw()
     GLint location = glGetUniformLocation(m_shaderProgram, "H");
     if (location == -1)
     {
-      printf("Cannot get H\n");
-      exit(4);
     }
     else
     {
-      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)m_H1.data);
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)convert(m_H1, m_image1.size().width, m_image1.size().height).data);
     }
 
     // Draw a rectangle from the 2 triangles using 6 indices
@@ -299,12 +302,11 @@ void Painter::draw()
     GLint location = glGetUniformLocation(m_shaderProgram, "H");
     if (location == -1)
     {
-      printf("Cannot get H\n");
-      exit(4);
+      std::cout << "Cannot get H" << std::endl;
     }
     else
     {
-      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)m_H2.data);
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)convert(m_H2, m_image2.size().width, m_image2.size().height).data);
     }
 
     // Draw a rectangle from the 2 triangles using 6 indices
@@ -317,4 +319,17 @@ void Painter::draw()
 void Painter::cleanupOpenGL()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
+}
+
+cv::Mat Painter::convert(cv::Mat input, int width, int height)
+{
+  float data[9] = {1.f/width, 0, 0,
+                  0, 1.f/height, 0,
+                  0, 0, 1};
+
+  cv::Mat inputFloat;
+  input.convertTo(inputFloat, CV_32FC1);
+  cv::Mat imageToGl(3, 3, CV_32FC1, &data);
+
+  return imageToGl * inputFloat.inv() * imageToGl.inv();
 }
