@@ -167,6 +167,7 @@ void Painter::setupOpenGL(int w, int h)
   glAttachShader(m_shaderProgram, fragmentShader);
   glLinkProgram(m_shaderProgram);
 
+    GL_CHECK();
 
   GLint isLinked = 0;
   glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &isLinked);
@@ -251,12 +252,12 @@ void Painter::draw()
 
     if (m_texture1Created)
     {
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image1.size().width, m_image1.size().height, GL_RGB, GL_UNSIGNED_BYTE, m_image1.data);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image1.size().width, m_image1.size().height, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
       GL_CHECK();
     }
     else
     {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image1.size().width, m_image1.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image1.data);
+      glTexImage2D(GL_TEXTURE_2D, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, m_image1.size().width, m_image1.size().height, 0, m_image1.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image1.data);
 
       GL_CHECK();
 
@@ -289,12 +290,12 @@ void Painter::draw()
     GL_CHECK();
     if (m_texture2Created)
     {
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image2.size().width, m_image2.size().height, GL_RGB, GL_UNSIGNED_BYTE, m_image2.data);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_image2.size().width, m_image2.size().height, m_image2.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image2.data);
       GL_CHECK();
     }
     else
     {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image2.size().width, m_image2.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image2.data);
+      glTexImage2D(GL_TEXTURE_2D, 0, m_image2.channels() == 3 ? GL_RGB : GL_RGBA, m_image2.size().width, m_image2.size().height, 0, m_image2.channels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, m_image2.data);
       m_texture2Created = true;
     }
 

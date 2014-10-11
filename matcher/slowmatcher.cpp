@@ -15,7 +15,10 @@ QualityMatcher::QualityMatcher()
 // ----------------------------------------------------------------------------------
 QualityMatcher::~QualityMatcher()
 {
-
+  if (m_matchingThread)
+  {
+    m_matchingThread->join();
+  }
 }
 
 // ----------------------------------------------------------------------------------
@@ -29,8 +32,8 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   
   // prefilter slightly
   cv::Mat imgSrc, imgDst;
-  cv::medianBlur(imageSrc, imgSrc, 3);
-  cv::medianBlur(imageDst, imgDst, 3);
+  cv::medianBlur(imageSrc, imgSrc, 5);
+  cv::medianBlur(imageDst, imgDst, 5);
   
   cv::Mat descriptorsSrc, descriptorsDst;
   
@@ -104,5 +107,5 @@ void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Ma
   cv::split(imageSrc, rgbSrc);
   cv::split(imageDst, rgbDst);
     
-  m_matchingThread.reset(new boost::thread(boost::bind(&QualityMatcher::doTheMagic, this, rgbSrc[1], rgbDst[1], priorH, cb)));
+  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, rgbSrc[1], rgbDst[1], priorH, cb)));
 }

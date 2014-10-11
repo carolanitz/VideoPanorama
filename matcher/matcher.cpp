@@ -1,5 +1,7 @@
 #include "matcher.hpp"
 
+#include <functional>
+
 Matcher::Matcher()
     : m_matcherAvalable(true)
 {
@@ -44,11 +46,13 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, int64
 
   //m_fastMatcher.updateImage1(image, orientationQuaternion, timestamp);
 
+  using namespace std::placeholders;  // for _1, _2, _3...
+
   // if quality matcher is avalable, then send new image to it
   if (m_matcherAvalable && !m_lastImage[1].empty())
   {
     m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1], m_H_1to2, 
-        boost::bind(&Matcher::matched1to2, this, _1, _2));
+        std::bind(&Matcher::matched1to2, this, _1, _2));
     m_matcherAvalable = false;
   }
   m_painter.updateImage1(image);
@@ -61,18 +65,15 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, int64
 
   m_lastImage[1] = image;
   
+  using namespace std::placeholders;  // for _1, _2, _3...
+
   if (m_matcherAvalable && !m_lastImage[0].empty())
   {
     m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_H_1to2.inv(), 
-        boost::bind(&Matcher::matched2to1, this, _1, _2));
+        std::bind(&Matcher::matched2to1, this, _1, _2));
     m_matcherAvalable = false;
   }
   m_painter.updateImage2(image);
-  
-  //m_fastMatcher.updateImage2(image, orientationQuaternion, timestamp);
-  //m_slowMatcher.updateImage2(m_fastMatcher.image2(), m_fastMatcher.quaternion2());
-  //m_painter.updateImage2(m_slowMatcher.image2());
-  //m_painter.updateHomography2(m_slowMatcher.homography2());
 }
 
 // ----------------------------------------------------------------------------------
@@ -82,6 +83,7 @@ void Matcher::matched1to2(bool valid, cv::Mat H)
   if (!valid) return;
   
   m_H_1to2 = H;
+  m_painter.updateHomography2(H.inv());  
   m_matcherAvalable = true;  
 }
 
@@ -92,6 +94,7 @@ void Matcher::matched2to1(bool valid, cv::Mat H)
   if (!valid) return;
 
   m_H_1to2 = H.inv();
+  m_painter.updateHomography2(H);  
   m_matcherAvalable = true;  
 }
 

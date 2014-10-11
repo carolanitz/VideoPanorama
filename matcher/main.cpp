@@ -29,13 +29,15 @@ int w = 800;
 int h = 600;
 /* Handler for window-repaint event. Call back when the window first appears and
    whenever the window needs to be re-painted. */
-void display() {
+void display()
+{
   if (!setup)
   {
     matcher.setupOpenGL(w, h);
     setup = true;
   }
   matcher.draw();
+  glutSwapBuffers();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -65,18 +67,12 @@ void timer(int)
     video0 >> frame0;
     video1 >> frame1;
   }
-  
-  /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
-  cv::imshow("imgae1", frame0);
-  cv::imshow("imgae2", frame1);
-  cv::waitKey(0);*/
-  
-  
+    
   matcher.updateImage1(frame0, orientation0, time0);
   matcher.updateImage2(frame1, orientation1, time1);
 
   glutTimerFunc(refreshMillis, timer, 0); // subsequent timer call at milliseconds
-          glutPostRedisplay();
+  glutPostRedisplay();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -155,5 +151,6 @@ int main(int argc, char* argv[])
   glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
   glutDisplayFunc(display); // Register display callback handler for window re-paint
   glutTimerFunc(0, timer, 0);   // First timer call immediately
+  //glutIdleFunc(timer);
   glutMainLoop();           // Enter the event-processing loop
 }

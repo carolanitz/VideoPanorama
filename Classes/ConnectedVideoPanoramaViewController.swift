@@ -25,6 +25,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         session.delegate = self
         advertiser.delegate = self
         println("Starting Advertiser")
