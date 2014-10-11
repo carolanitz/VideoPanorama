@@ -323,13 +323,18 @@ void Painter::cleanupOpenGL()
 
 cv::Mat Painter::convert(cv::Mat input, int width, int height)
 {
-  float data[9] = {1.f/width, 0, 0,
+  float dataTextureScale[9] = {2.0, 0, -0.5,
+                  0, 2.0, -0.5,
+                  0, 0, 1};
+  cv::Mat textureScale(3, 3, CV_32FC1, &dataTextureScale);
+
+  float dataImageToTexture[9] = {1.f/width, 0, 0,
                   0, 1.f/height, 0,
                   0, 0, 1};
+  cv::Mat imageToTexture(3, 3, CV_32FC1, &dataImageToTexture);
 
   cv::Mat inputFloat;
   input.convertTo(inputFloat, CV_32FC1);
-  cv::Mat imageToGl(3, 3, CV_32FC1, &data);
 
-  return imageToGl * inputFloat.inv() * imageToGl.inv();
+  return textureScale * imageToTexture * inputFloat.inv() * imageToTexture.inv();
 }
