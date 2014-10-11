@@ -8,6 +8,7 @@
 
 import Foundation
 import MultipeerConnectivity
+import CoreMedia
 
 class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdvertiserAssistantDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate {
     
@@ -54,13 +55,25 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary
         self.capturePipeline.videoDevice.lockForConfiguration(nil)
+
         var whiteBalanceGainData = myDictionary.objectForKey("whiteBalance") as NSData
         var whiteBalanceGain:AVCaptureWhiteBalanceGains = AVCaptureWhiteBalanceGains(redGain: 0,greenGain: 0,blueGain: 0)
         whiteBalanceGainData.getBytes(&whiteBalanceGain, length: sizeof(AVCaptureWhiteBalanceGains))
         self.capturePipeline.videoDevice.setWhiteBalanceModeLockedWithDeviceWhiteBalanceGains(whiteBalanceGain, completionHandler: nil)
+
+        var focusData = myDictionary.objectForKey("focus") as NSData
+        var focus:Float = Float(0.0)
+        focusData.getBytes(&focus, length: sizeof(Float))
+        self.capturePipeline.videoDevice.setFocusModeLockedWithLensPosition(focus, completionHandler: nil)
+
+        var ISOData = myDictionary.objectForKey("ISO") as NSData
+        var iso:Float = Float(0.0)
+        ISOData.getBytes(&iso, length: sizeof(Float))
+
+        var exposure = CMTimeMakeFromDictionary(myDictionary.objectForKey("exposure") as NSDictionary)
+        self.capturePipeline.videoDevice.setExposureModeCustomWithDuration(exposure, ISO: iso, completionHandler: nil)
+
         self.capturePipeline.videoDevice.unlockForConfiguration()
-
-
     }
     
     func session(session: MCSession!, didReceiveStream stream: NSInputStream!, withName streamName: String!, fromPeer peerID: MCPeerID!) {
@@ -98,6 +111,18 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
             var whiteBalance = self.capturePipeline.videoDevice.deviceWhiteBalanceGains
             var data = NSData(bytes:&whiteBalance, length: sizeof(AVCaptureWhiteBalanceGains))
             dict.setObject(data, forKey: "whiteBalance")
+
+            var focus = self.capturePipeline.videoDevice.lensPosition
+            data = NSData(bytes:&focus, length: sizeof(Float))
+            dict.setObject(data, forKey: "focus")
+
+            var exposure = CMTimeCopyAsDictionary(self.capturePipeline.videoDevice.exposureDuration, kCFAllocatorDefault)
+            dict.setObject(exposure, forKey: "exposure")
+
+            var iso = self.capturePipeline.videoDevice.ISO
+            data = NSData(bytes:&iso, length: sizeof(Float))
+            dict.setObject(data, forKey: "ISO")
+
             var myData = NSKeyedArchiver.archivedDataWithRootObject(dict)
             self.session.sendData(myData, toPeers: self.session.connectedPeers, withMode: .Reliable, error: nil)
         })
