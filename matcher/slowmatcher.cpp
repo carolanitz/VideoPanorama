@@ -78,5 +78,5 @@ void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Ma
   cv::Mat a = imageSrc.clone();
   cv::Mat b = imageDst.clone();
   
-  m_matchingThread.reset(new boost::thread(boost::bind(&QualityMatcher::doTheMagic, this, a, b, priorH, cb)));
+  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, a, b, priorH, cb)));
 }
