@@ -8,7 +8,7 @@
 #include <functional>
 #include <iostream>
 
-//#define DEBUG_SENSORS
+#define DEBUG_SENSORS
 
 // ----------------------------------------------------------------------------------
 Matcher::Matcher()
@@ -76,7 +76,7 @@ void Matcher::updateIntermediate()
   H = H * m_K * R.toRotationMatrix() * m_iK;
   H /= H(2,2);
   
-  float a = 0.3; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
   for (int i=0; i < 3; i++)
     for (int j=0; j < 3; j++)
       H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
@@ -105,8 +105,8 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   std::lock_guard<std::mutex> lock(m_mutex);
   
   // accumulate orientation
-  Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
-  //Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
+  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
+  Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[0].conjugate();
   m_lastOrientation[0] = q;
   if (!m_lastImage[0].empty())
@@ -141,8 +141,8 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   std::lock_guard<std::mutex> lock(m_mutex);
   
   // accumulate orientation
-  Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
-  //Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
+  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
+  Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[1].conjugate();
   m_lastOrientation[1] = q;
   if (!m_lastImage[1].empty())
