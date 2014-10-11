@@ -51,6 +51,7 @@
 		269351C0156CB42100512474 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		281FB47E176694640071511D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = Resources/en.lproj/Main.storyboard; sourceTree = SOURCE_ROOT; };
 		28365598139FE71B00D09100 /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
+		31A7A18719E9A63700C95195 /* Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
 		41A05D3919E91921004B6BBA /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
 		41A05D4C19E926B7004B6BBA /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		41A05D4E19E93395004B6BBA /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -219,6 +220,7 @@
 				8252DB3719E937DE00403DCB /* Connectivity */,
 				6F90DDEB1395CAAA00125BDA /* VideoPanoramaViewController.h */,
 				6F90DDED1395CAAA00125BDA /* VideoPanoramaViewController.mm */,
+				31A7A18719E9A63700C95195 /* Globals.h */,
 				6F90DE0E1395CD9C00125BDA /* VideoPanoramaCapturePipeline.h */,
 				6F90DE0F1395CD9C00125BDA /* VideoPanoramaCapturePipeline.m */,
 				5DC09BF119B7F51B0025A16E /* Renderers */,

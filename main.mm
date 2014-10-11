@@ -48,9 +48,12 @@
 #import <UIKit/UIKit.h>
 
 #import "VideoPanoramaAppDelegate.h"
+#import "Globals.h"
 
 int main(int argc, char *argv[])
 {
+   isSender = false;
+
 	int retVal = 0;
 	@autoreleasepool {
 	    retVal = UIApplicationMain( argc, argv, nil, NSStringFromClass( [VideoPanoramaAppDelegate class] ) );

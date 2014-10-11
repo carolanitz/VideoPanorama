@@ -14,26 +14,25 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     
     let serviceType = "VideoPanorama"
     var peerID: MCPeerID
-    var session: MCSession
     var advertiser: MCAdvertiserAssistant
     
     required init(coder aDecoder: NSCoder) {
         peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
-        session = MCSession(peer: peerID)
-        advertiser = MCAdvertiserAssistant(serviceType: serviceType, discoveryInfo: nil, session: session)
+        networkSession = MCSession(peer: peerID)
+        advertiser = MCAdvertiserAssistant(serviceType: serviceType, discoveryInfo: nil, session: networkSession)
         super.init(coder: aDecoder)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        session.delegate = self
+        networkSession.delegate = self
         advertiser.delegate = self
         println("Starting Advertiser")
         advertiser.start()
     }
     
     @IBAction func connect() {
-        let browser = MCBrowserViewController(serviceType: serviceType, session: session)
+        let browser = MCBrowserViewController(serviceType: serviceType, session: networkSession)
         browser.delegate = self
         presentViewController(browser, animated: true, completion: nil)
     }
@@ -51,6 +50,13 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     }
     
     func session(session: MCSession!, didReceiveData data: NSData!, fromPeer peerID: MCPeerID!) {
+      if (isSender)
+      {
+         println("GOt HUUUUGE Data");
+      
+      }
+      else
+      {
         self.capturePipeline.startRunning()
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary
@@ -74,6 +80,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         self.capturePipeline.videoDevice.setExposureModeCustomWithDuration(exposure, ISO: iso, completionHandler: nil)
 
         self.capturePipeline.videoDevice.unlockForConfiguration()
+      }
     }
     
     func session(session: MCSession!, didReceiveStream stream: NSInputStream!, withName streamName: String!, fromPeer peerID: MCPeerID!) {
@@ -89,6 +96,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
     }
     
     @IBAction func send() {
+      isSender = true;
         self.capturePipeline.startRunning()
         var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("sendSettings"), userInfo: nil, repeats: false)
 
@@ -124,7 +132,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
             dict.setObject(data, forKey: "ISO")
 
             var myData = NSKeyedArchiver.archivedDataWithRootObject(dict)
-            self.session.sendData(myData, toPeers: self.session.connectedPeers, withMode: .Reliable, error: nil)
+            networkSession.sendData(myData, toPeers: networkSession.connectedPeers, withMode: .Reliable, error: nil)
         })
         self.capturePipeline.videoDevice.unlockForConfiguration()
         println("settings")

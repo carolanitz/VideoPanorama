@@ -54,6 +54,7 @@
 //	- Make sure framework is included under the target's Build Phases -> Link Binary With Libraries.
 #import <opencv2/opencv.hpp>
 #import "VideoPanoramaAppDelegate.h"
+#import "Globals.h"
 
 @implementation VideoPanoramaOpenCVRenderer{
 
@@ -99,13 +100,18 @@
 	// Use extendedWidth instead of width to account for possible row extensions (sometimes used for memory alignment).
 	// We only need to work on columms from [0, width - 1] regardless.
 	
+   if (isSender)
+   {
+      [networkSession sendData:[NSData dataWithBytes:base length:height*stride] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
+   }
+   else
+   {
 	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
     cv::Vec4f motionvector;
     motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
     NSLog(@"%f, %f, %f", motion.attitude.quaternion.x,motion.attitude.quaternion.y,motion.attitude.quaternion.z);
     [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, 0);
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(bgraImage.clone(), cv::Vec4f(), 0);
-
+   }
 
 	CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
 	

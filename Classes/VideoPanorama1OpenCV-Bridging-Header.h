@@ -3,3 +3,4 @@
 //
 
 #import "VideoPanoramaViewController.h"
+#import "Globals.h"
