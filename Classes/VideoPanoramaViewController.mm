@@ -50,6 +50,7 @@
 #import <GLKit/GLKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "VideoPanoramaAppDelegate.h"
+#include <opencv2/highgui/highgui.hpp>
 
 @interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate, GLKViewDelegate>
 {
@@ -330,7 +331,10 @@
 
 -(void) sendDataToMatcher: (NSData *)data
 {
-   cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
+   cv::Mat jpg([data length], 1, CV_8UC1, (unsigned char*)data.bytes);
+   cv::Mat image = cv::imdecode(jpg, CV_LOAD_IMAGE_COLOR);
+
+   //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(), 0);
 }
 

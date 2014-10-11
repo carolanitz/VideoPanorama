@@ -46,6 +46,7 @@
  
  */
 
+#include <opencv2/highgui/highgui.hpp>
 #import "VideoPanoramaOpenCVRenderer.h"
 
 // To build OpenCV into the project:
@@ -99,14 +100,16 @@
 	
 	// Use extendedWidth instead of width to account for possible row extensions (sometimes used for memory alignment).
 	// We only need to work on columms from [0, width - 1] regardless.
-	
+   cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
+
    if (!isSender)
    {
-      [networkSession sendData:[NSData dataWithBytes:base length:height*stride] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
+      std::vector<uchar> buffer;
+      cv::imencode("jpg", bgraImage, buffer);
+      [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
    }
    else
    {
-	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
     cv::Vec4f motionvector;
     motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
     [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, 0);
