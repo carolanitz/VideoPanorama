@@ -32,8 +32,7 @@
 		696D282419CA539900A23D81 /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = 28365598139FE71B00D09100 /* ReadMe.txt */; };
 		696D282519CA539900A23D81 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7214DBCD182AEF8900EA3F99 /* Images.xcassets */; };
 		696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1FCCE63019B92B1B009D7A6B /* VideoPanoramaOpenCVRenderer.mm */; };
-		8252DB3919E9381500403DCB /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8252DB3819E9381500403DCB /* Storyboard.storyboard */; };
-		8252DB3C19E938A700403DCB /* SourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8252DB3B19E938A700403DCB /* SourceViewController.swift */; };
+		8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,9 +77,8 @@
 		6FF11C9316A877B100E14D71 /* ShaderUtilities.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ShaderUtilities.c; path = Utilities/GL/ShaderUtilities.c; sourceTree = "<group>"; };
 		6FF11C9416A877B100E14D71 /* ShaderUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderUtilities.h; path = Utilities/GL/ShaderUtilities.h; sourceTree = "<group>"; };
 		7214DBCD182AEF8900EA3F99 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Resources/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		8252DB3819E9381500403DCB /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		8252DB3A19E938A600403DCB /* VideoPanorama1OpenCV-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VideoPanorama1OpenCV-Bridging-Header.h"; sourceTree = "<group>"; };
-		8252DB3B19E938A700403DCB /* SourceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceViewController.swift; sourceTree = "<group>"; };
+		8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectedVideoPanoramaViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,8 +219,7 @@
 		8252DB3719E937DE00403DCB /* Connectivity */ = {
 			isa = PBXGroup;
 			children = (
-				8252DB3819E9381500403DCB /* Storyboard.storyboard */,
-				8252DB3B19E938A700403DCB /* SourceViewController.swift */,
+				8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */,
 			);
 			name = Connectivity;
 			sourceTree = "<group>";
@@ -293,7 +290,6 @@
 				696D282219CA539900A23D81 /* Launch.storyboard in Resources */,
 				696D282319CA539900A23D81 /* VideoPanoramaViewController.h in Resources */,
 				696D282419CA539900A23D81 /* ReadMe.txt in Resources */,
-				8252DB3919E9381500403DCB /* Storyboard.storyboard in Resources */,
 				696D282519CA539900A23D81 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -310,9 +306,9 @@
 				696D280D19CA539900A23D81 /* VideoPanoramaViewController.m in Sources */,
 				696D280F19CA539900A23D81 /* VideoPanoramaCapturePipeline.m in Sources */,
 				696D281019CA539900A23D81 /* ShaderUtilities.c in Sources */,
-				8252DB3C19E938A700403DCB /* SourceViewController.swift in Sources */,
 				696D281119CA539900A23D81 /* MovieRecorder.m in Sources */,
 				696D281219CA539900A23D81 /* OpenGLPixelBufferView.m in Sources */,
+				8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */,
 				696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
