@@ -18,7 +18,7 @@ set(SOURCES
 add_executable(matcher ${SOURCES})
 
 find_package(OpenCV REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem system)
+find_package(Boost REQUIRED COMPONENTS filesystem system thread)
 include_directories(${Boost_INCLUDE_DIRS})
 target_link_libraries(matcher ${Boost_LIBRARIES})
 target_link_libraries(matcher ${OpenCV_LIBS})

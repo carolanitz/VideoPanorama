@@ -2,26 +2,24 @@
 #define VIDEO_PANORAMA_SLOW_MATCHER_MATCHER_HPP
 
 #include <opencv2/core/core.hpp>
+#include <boost/thread.hpp>
 
-class SlowMatcher {
+class QualityMatcher {
 
 public:
-  SlowMatcher();
-  ~SlowMatcher();
+  QualityMatcher();
+  virtual ~QualityMatcher();
 
-  // Set new images
-  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion);
-  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion);
+  typedef boost::function<void(bool, cv::Mat)> MatchingResultCallback;
 
-  cv::Mat image1();
-  cv::Mat image2();
-
-  cv::Mat homography1();
-  cv::Mat homography2();
+  void matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb);
 
 private:
-  cv::Mat m_image1;
-  cv::Mat m_image2;
+
+  MatchingResultCallback m_matchResultCallback;
+
+  boost::shared_ptr<boost::thread> m_matchingThread;
+  void doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat priorH, MatchingResultCallback cb);
 };
 
 
