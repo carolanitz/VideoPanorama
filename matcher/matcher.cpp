@@ -127,11 +127,11 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
     m_matcherAvalable = false;
 #endif
   }
-  
+   m_painter.updateImage1(image);
+
   if (m_tracking)
   {
     updateIntermediate();
-    m_painter.updateImage1(image);
   }
 }
 
@@ -168,8 +168,10 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   if (m_tracking)
   {
     updateIntermediate();
-    m_painter.updateImage2(image);
+     m_painter.updateImage2(image);
+
   }
+
 }
 
 // ----------------------------------------------------------------------------------
