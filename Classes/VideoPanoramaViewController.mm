@@ -335,7 +335,7 @@
    cv::Mat image = cv::imdecode(jpg, CV_LOAD_IMAGE_COLOR);
 
    //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
-   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(), 0);
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(0, 0, 0, 1), 0);
 }
 
 @end

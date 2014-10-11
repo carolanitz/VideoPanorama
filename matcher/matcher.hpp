@@ -6,7 +6,6 @@
 #include <Eigen/Geometry>
 
 #include "painter.hpp"
-#include "fastmatcher.hpp"
 #include "slowmatcher.hpp"
 
 class Matcher {

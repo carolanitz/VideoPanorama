@@ -11,7 +11,6 @@
 		41A05D5119E933AB004B6BBA /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41A05D5019E933AB004B6BBA /* libstdc++.dylib */; };
 		41A05D5219E933DD004B6BBA /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41A05D4E19E93395004B6BBA /* libc++.dylib */; };
 		41F775A019E93F9C00F0F4C4 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41A05D4C19E926B7004B6BBA /* GLKit.framework */; };
-		41F775AD19E9457E00F0F4C4 /* fastmatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775A319E9457E00F0F4C4 /* fastmatcher.cpp */; };
 		41F775AF19E9457E00F0F4C4 /* matcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775A619E9457E00F0F4C4 /* matcher.cpp */; };
 		41F775B019E9457E00F0F4C4 /* painter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775A819E9457E00F0F4C4 /* painter.cpp */; };
 		41F775B119E9457E00F0F4C4 /* slowmatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 41F775AA19E9457E00F0F4C4 /* slowmatcher.cpp */; };
@@ -56,8 +55,6 @@
 		41A05D4C19E926B7004B6BBA /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		41A05D4E19E93395004B6BBA /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		41A05D5019E933AB004B6BBA /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
-		41F775A319E9457E00F0F4C4 /* fastmatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fastmatcher.cpp; sourceTree = "<group>"; };
-		41F775A419E9457E00F0F4C4 /* fastmatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fastmatcher.hpp; sourceTree = "<group>"; };
 		41F775A619E9457E00F0F4C4 /* matcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matcher.cpp; sourceTree = "<group>"; };
 		41F775A719E9457E00F0F4C4 /* matcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = matcher.hpp; sourceTree = "<group>"; };
 		41F775A819E9457E00F0F4C4 /* painter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = painter.cpp; sourceTree = "<group>"; };
@@ -137,8 +134,6 @@
 		41F775A119E9457E00F0F4C4 /* matcher */ = {
 			isa = PBXGroup;
 			children = (
-				41F775A319E9457E00F0F4C4 /* fastmatcher.cpp */,
-				41F775A419E9457E00F0F4C4 /* fastmatcher.hpp */,
 				41F775A619E9457E00F0F4C4 /* matcher.cpp */,
 				41F775A719E9457E00F0F4C4 /* matcher.hpp */,
 				41F775A819E9457E00F0F4C4 /* painter.cpp */,
@@ -312,6 +307,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0600;
+				TargetAttributes = {
+					696D280919CA539900A23D81 = {
+						DevelopmentTeam = D3M8W2VDKH;
+					};
+				};
 			};
 			buildConfigurationList = 6F90DDCF1395CAAA00125BDA /* Build configuration list for PBXProject "VideoPanorama1" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -363,7 +363,6 @@
 				696D281119CA539900A23D81 /* MovieRecorder.m in Sources */,
 				8252DB4019E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift in Sources */,
 				696D282B19CA548500A23D81 /* VideoPanoramaOpenCVRenderer.mm in Sources */,
-				41F775AD19E9457E00F0F4C4 /* fastmatcher.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
