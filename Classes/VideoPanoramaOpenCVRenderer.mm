@@ -105,7 +105,10 @@
    if (!isSender)
    {
       std::vector<uchar> buffer;
-      cv::imencode("jpg", bgraImage, buffer);
+      std::vector<int> params;
+      params.push_back(CV_IMWRITE_JPEG_QUALITY);
+      params.push_back(20);
+      cv::imencode(".jpg", bgraImage, buffer, params);
       [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
    }
    else
