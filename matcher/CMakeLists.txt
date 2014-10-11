@@ -15,7 +15,8 @@ set(SOURCES
   painter.hpp
   painter.cpp)
 
-add_definitions(-DTARGET_IPHONE_SIMULATOR)
+#add_definitions(-DTARGET_IPHONE_SIMULATOR)
+add_definitions(-DTARGET_DACUDAS_LINUX_BUILD_SERVER_PLEASE_RENAME)
 
 add_executable(matcher ${SOURCES})
 

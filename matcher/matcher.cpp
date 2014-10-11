@@ -2,6 +2,7 @@
 
 #include <functional>
 
+// ----------------------------------------------------------------------------------
 Matcher::Matcher()
     : m_matcherAvalable(true)
 {
@@ -11,22 +12,28 @@ Matcher::Matcher()
   m_painter.updateHomography2(m_H_1to2);
 }
 
+// ----------------------------------------------------------------------------------
 Matcher::~Matcher()
 {
 }
 
+// ----------------------------------------------------------------------------------
 void Matcher::setupOpenGL(int width, int height)
 {
   // Thread safe
   m_painter.setupOpenGL(width, height);
 }
 
+// ----------------------------------------------------------------------------------
 void Matcher::draw()
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  
   // Thread safe
   m_painter.draw();
 }
 
+// ----------------------------------------------------------------------------------
 void Matcher::cleanupOpenGL()
 {
   // Thread safe
