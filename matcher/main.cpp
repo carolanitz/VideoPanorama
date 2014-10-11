@@ -3,6 +3,11 @@
 #include <GL/glut.h>  // GLUT, include glu.h and gl.h
 #include "opencv2/highgui/highgui.hpp"
 
+#include <vector>
+#include <string>
+#include <boost/filesystem.hpp>
+
+
 cv::VideoCapture video0, video1;
 Matcher matcher;
 
@@ -21,10 +26,60 @@ void timer(int) {
   cv::Mat3b frame1;
   video1 >> frame1;
 
-  matcher.updateImage1(frame0, {0, 0, 0, 0});
-  matcher.updateImage2(frame1, {0, 0, 0, 0});
+  matcher.updateImage1(frame0, {0, 0, 0, 0}, 0);
+  matcher.updateImage2(frame1, {0, 0, 0, 0}, 0);
 
   glutTimerFunc(refreshMillis, timer, 0); // subsequent timer call at milliseconds
+}
+
+struct Data
+{
+   cv::Mat img;
+   cv::Vec3f gyro;
+   int64_t timestamp;
+};
+
+std::vector<Data> input[2];
+
+void readInput(const std::string& in1, const std::string& in2)
+{
+    namespace fs = boost::filesystem;
+    std::string dir[2];
+    dir[0] = in1;
+    dir[1] = in2;
+
+    for (int i=0; i < 2; i++)
+    {
+        fs::path path = dir[i];
+        std::vector<fs::path> in_png;
+
+        if (fs::is_directory(path))
+        {
+           fs::recursive_directory_iterator it(path);
+           fs::recursive_directory_iterator endit;
+           while(it != endit)
+           {
+              if (fs::is_regular_file(*it) && (it->path().extension() == ".png"))
+              {
+                 in_png.push_back(it->path());
+              }
+              ++it;
+           }
+        }
+
+        std::sort(in_png.begin(), in_png.end());
+
+        // import
+        for (fs::path& filepath : in_png)
+        {
+           std::string imgfile = filepath.string();
+           std::string datfile = filepath.replace_extension(".dat").string();
+
+           Data d;
+           d.img = cv::imread(imgfile);
+           input[i].push_back(d);
+        }
+    }
 }
 
 int main(int argc, char* argv[])

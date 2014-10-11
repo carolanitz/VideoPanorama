@@ -25,12 +25,12 @@ void Matcher::cleanupOpenGL()
 
 }
 
-void Matcher::updateImage2(cv::Mat image, cv::Vec4f gyro)
+void Matcher::updateImage2(cv::Mat image, cv::Vec4f gyro, int64_t timestamp)
 {
 
 }
 
-void Matcher::updateImage1(cv::Mat image, cv::Vec4f gyro)
+void Matcher::updateImage1(cv::Mat image, cv::Vec4f gyro, int64_t timestamp)
 {
 
 }
