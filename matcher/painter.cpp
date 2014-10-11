@@ -6,9 +6,13 @@ const GLchar* vertexSource = R"(
     in vec2 position;
     in vec2 texcoord;
     out vec2 Texcoord;
+    uniform mat3 H;
     void main() {
       Texcoord = texcoord;
-      gl_Position = vec4(position, 0.0, 1.0);
+
+      vec3 projected = H*vec3(position, 1.0f);
+      gl_Position.xy = projected.xy / projected.z;
+      gl_Position.zw = vec2(0.0, 1.0);
     }
 )";
 const GLchar* fragmentSource = R"(
@@ -16,10 +20,9 @@ const GLchar* fragmentSource = R"(
     precision mediump float;
     in vec2 Texcoord;
     out vec4 outColor;
-    uniform sampler2D image1;
-    uniform sampler2D image2;
+    uniform sampler2D image;
     void main() {
-       outColor = mix(texture(image1, Texcoord), texture(image2, Texcoord), 0.5);
+       outColor = texture(image, Texcoord);
     }
 )";
 
@@ -148,27 +151,27 @@ void Painter::setupOpenGL(int w, int h)
   checkErrors();
 
   // Link the vertex and fragment shader into a shader program
-  GLuint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
+  m_shaderProgram = glCreateProgram();
+  glAttachShader(m_shaderProgram, vertexShader);
+  glAttachShader(m_shaderProgram, fragmentShader);
+  glLinkProgram(m_shaderProgram);
 
 
   GLint isLinked = 0;
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &isLinked);
+  glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &isLinked);
   if(isLinked == GL_FALSE)
   {
     GLint maxLength = 0;
-    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
+    glGetProgramiv(m_shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
 
     //The maxLength includes the NULL character
     std::vector<GLchar> infoLog(maxLength);
-    glGetProgramInfoLog(shaderProgram, maxLength, &maxLength, &infoLog[0]);
+    glGetProgramInfoLog(m_shaderProgram, maxLength, &maxLength, &infoLog[0]);
 
     printf("Error: %s\n", &infoLog[0]);
 
     //The program is useless now. So delete it.
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(m_shaderProgram);
 
     //Provide the infolog in whatever manor you deem best.
     //Exit with failure.
@@ -176,25 +179,30 @@ void Painter::setupOpenGL(int w, int h)
   }
 
 
-  glUseProgram(shaderProgram);
+  glUseProgram(m_shaderProgram);
 
   checkErrors();
 
   // Specify the layout of the vertex data
-  GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+  GLint posAttrib = glGetAttribLocation(m_shaderProgram, "position");
   glEnableVertexAttribArray(posAttrib);
   glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 
-  GLint texAttrib = glGetAttribLocation(shaderProgram, "texcoord");
+  GLint texAttrib = glGetAttribLocation(m_shaderProgram, "texcoord");
   glEnableVertexAttribArray(texAttrib);
   glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+  GLint HAttrib = glGetAttribLocation(m_shaderProgram, "H");
+  glEnableVertexAttribArray(HAttrib);
+  glVertexAttribPointer(HAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
 
   // Load textures
   glGenTextures(2, m_textures);
 
+  glUniform1i(glGetUniformLocation(m_shaderProgram, "image"), 0);
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-  glUniform1i(glGetUniformLocation(shaderProgram, "image1"), 0);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -203,7 +211,6 @@ void Painter::setupOpenGL(int w, int h)
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_textures[1]);
-  glUniform1i(glGetUniformLocation(shaderProgram, "image2"), 1);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -217,27 +224,62 @@ void Painter::draw()
 {
   std::lock_guard<std::mutex> lock(m_mutex);
 
-  if (!m_image1.empty())
-  {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image1.size().width, m_image1.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image1.data);
-  }
-
-  if (!m_image2.empty())
-  {
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_textures[1]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image2.size().width, m_image2.size().height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_image2.data);
-  }
 
   // Clear the screen to black
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // Draw a rectangle from the 2 triangles using 6 indices
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glActiveTexture(GL_TEXTURE0);
+
+  if (!m_image1.empty())
+  {
+    glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image1.size().width, m_image1.size().height, 0, GL_BGR, GL_UNSIGNED_BYTE, m_image1.data);
+
+    float H[9] = {1, 0, 0,
+                  0, 1, 0,
+                  0, 0, 1};
+
+    GLint location = glGetUniformLocation(m_shaderProgram, "H");
+    if (location == -1)
+    {
+      printf("Cannot get H\n");
+      exit(4);
+    }
+    else
+    {
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, H);
+    }
+
+    // Draw a rectangle from the 2 triangles using 6 indices
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  }
+
+  if (!m_image2.empty())
+  {
+    glBindTexture(GL_TEXTURE_2D, m_textures[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_image2.size().width, m_image2.size().height, 0, GL_BGR, GL_UNSIGNED_BYTE, m_image2.data);
+
+    float H[9] = {1, 0, 0.5,
+                  0, 1, 0,
+                  0, 0, 1};
+
+    GLint location = glGetUniformLocation(m_shaderProgram, "H");
+    if (location == -1)
+    {
+      printf("Cannot get H\n");
+      exit(4);
+    }
+    else
+    {
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, H);
+    }
+
+    // Draw a rectangle from the 2 triangles using 6 indices
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  }
+
   checkErrors();
 
 }

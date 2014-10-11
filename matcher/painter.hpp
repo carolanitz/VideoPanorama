@@ -32,7 +32,7 @@ private:
   std::mutex m_mutex;
 
   cv::Mat m_image1, m_image2;
-
+  GLuint m_shaderProgram;
   GLuint m_textures[2];
 
 };
