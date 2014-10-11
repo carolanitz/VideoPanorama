@@ -102,7 +102,7 @@
 	// We only need to work on columms from [0, width - 1] regardless.
    cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
 
-   if (!isSender && isStarted)
+   if (!isSender && isStarted && isReadyForData)
    {
       std::vector<uchar> buffer;
       std::vector<int> params;
@@ -110,6 +110,7 @@
       params.push_back(20);
       cv::imencode(".jpg", bgraImage, buffer, params);
       [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
+      isReadyForData = false;
    }
 
    {

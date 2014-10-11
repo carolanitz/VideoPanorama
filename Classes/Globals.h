@@ -14,4 +14,5 @@
 extern BOOL isSender;
 extern MCSession *networkSession;
 extern BOOL isStarted;
+extern BOOL isReadyForData;
 #endif

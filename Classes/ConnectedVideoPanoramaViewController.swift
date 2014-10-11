@@ -55,9 +55,20 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
       {
          println("GOt HUUUUGE Data");
          sendDataToMatcher(data);
+         
+         
+         let datab = "abc".dataUsingEncoding(NSUTF8StringEncoding)
+
+         networkSession.sendData(datab, toPeers: networkSession.connectedPeers, withMode: .Reliable, error: nil)
       }
       else
       {
+         if (isStarted)
+         {
+            isReadyForData = true;
+         }
+         else
+         {
          isStarted = true;
         println("Got camera settings")
         var myDictionary: NSDictionary = NSKeyedUnarchiver.unarchiveObjectWithData(data) as NSDictionary
@@ -81,6 +92,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         self.capturePipeline.videoDevice.setExposureModeCustomWithDuration(exposure, ISO: iso, completionHandler: nil)
 
         self.capturePipeline.videoDevice.unlockForConfiguration()
+         }
       }
     }
     

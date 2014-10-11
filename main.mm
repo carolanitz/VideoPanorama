@@ -51,11 +51,13 @@
 #import "Globals.h"
 
 BOOL isStarted;
+BOOL isReadyForData;
 
 int main(int argc, char *argv[])
 {
    isSender = false;
    isStarted = false;
+   isReadyForData = true;
 
 	int retVal = 0;
 	@autoreleasepool {
