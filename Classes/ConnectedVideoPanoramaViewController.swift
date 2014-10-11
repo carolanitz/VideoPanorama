@@ -29,6 +29,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         advertiser.delegate = self
         println("Starting Advertiser")
         advertiser.start()
+        navigationController?.navigationBar.barTintColor = UIColor.brownColor()
     }
     
     @IBAction func connect() {
