@@ -8,6 +8,7 @@
 
 import Foundation
 import MultipeerConnectivity
+import VideoToolbox
 
 class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdvertiserAssistantDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate {
     
@@ -74,6 +75,7 @@ class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdver
         let peer = session.connectedPeers[0] as MCPeerID
         println("About to send the video to \(peer.displayName)")
         let stream = session.startStreamWithName("Video", toPeer: peer, error: nil)
+        
     }
     
     
