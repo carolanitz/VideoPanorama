@@ -83,7 +83,7 @@
 	// nothing to do, we are stateless
 }
 
-- (CVPixelBufferRef)copyRenderedPixelBuffer:(CVPixelBufferRef)pixelBuffer
+- (CVPixelBufferRef)copyRenderedPixelBuffer:(CVPixelBufferRef)pixelBuffer motion:(CMDeviceMotion *)motion
 {
 	CVPixelBufferLockBaseAddress( pixelBuffer, 0 );
 	
@@ -100,7 +100,10 @@
 	// We only need to work on columms from [0, width - 1] regardless.
 	
 	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), cv::Vec4f(), 0);
+    cv::Vec4f motionvector;
+    motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
+    NSLog(@"%f, %f, %f", motion.attitude.quaternion.x,motion.attitude.quaternion.y,motion.attitude.quaternion.z);
+    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, 0);
     [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(bgraImage.clone(), cv::Vec4f(), 0);
 
 

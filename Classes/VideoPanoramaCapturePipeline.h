@@ -63,7 +63,7 @@
 // These methods are asynchronous, see the recording delegate callbacks
 - (void)startRecording;
 - (void)stopRecording;
-
+@property(nonatomic, retain) AVCaptureDevice *videoDevice;
 @property(readwrite) BOOL renderingEnabled; // When set to false the GPU will not be used after the setRenderingEnabled: call returns.
 
 @property(readwrite) AVCaptureVideoOrientation recordingOrientation; // client can set the orientation for the recorded movie

@@ -49,6 +49,7 @@
 
 #import <UIKit/UIKit.h>
 #import "matcher.hpp"
+#import <CoreMotion/CoreMotion.h>
 
 @interface VideoPanoramaAppDelegate : UIResponder <UIApplicationDelegate>{
     Matcher matcher;
