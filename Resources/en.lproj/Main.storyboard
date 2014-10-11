@@ -49,13 +49,13 @@
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" title="VideoPanorama" id="KRh-eK-cWt">
                         <barButtonItem key="leftBarButtonItem" title="Connect" id="RA1-IV-6XC">
-                            <color key="tintColor" red="1" green="0.73974886120000005" blue="0.38491074759999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="connect" destination="t7Y-jQ-554" id="aed-2a-X7b"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Send" style="plain" id="PlD-2E-KkV">
-                            <color key="tintColor" red="1" green="0.73974886120000005" blue="0.38491074759999999" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="send" destination="t7Y-jQ-554" id="MZN-QP-DNr"/>
                             </connections>
