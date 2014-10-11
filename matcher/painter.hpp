@@ -35,6 +35,8 @@ private:
   std::mutex m_mutex;
 
   cv::Mat m_image1, m_image2;
+  cv::Mat m_H1;
+  cv::Mat m_H2;
 
   bool m_texture1Created = false;
   bool m_texture2Created = false;

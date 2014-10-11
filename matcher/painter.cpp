@@ -31,7 +31,8 @@ const GLchar* fragmentSource = R"(
 
 Painter::Painter()
 {
-
+  m_H1 = cv::Mat3f::eye(3, 3);
+  m_H2 = cv::Mat3f::eye(3, 3);
 }
 
 Painter::~Painter()
@@ -51,12 +52,12 @@ void Painter::updateImage2(cv::Mat image)
 
 void Painter::updateHomography1(cv::Mat H)
 {
-
+  m_H1 = H;
 }
 
 void Painter::updateHomography2(cv::Mat H)
 {
-
+  m_H2 = H;
 }
 
 void _check_gl_error(const char* file, int line) {
@@ -264,10 +265,6 @@ void Painter::draw()
       m_texture1Created = true;
     }
 
-    float H[9] = {1, 0, 0,
-                  0, 1, 0,
-                  0, 0, 1};
-
     GLint location = glGetUniformLocation(m_shaderProgram, "H");
     if (location == -1)
     {
@@ -276,7 +273,7 @@ void Painter::draw()
     }
     else
     {
-      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, H);
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)m_H1.data);
     }
 
     // Draw a rectangle from the 2 triangles using 6 indices
@@ -299,10 +296,6 @@ void Painter::draw()
       m_texture2Created = true;
     }
 
-    float H[9] = {1, 0, 0.5,
-                  0, 1, 0,
-                  0, 0, 1};
-
     GLint location = glGetUniformLocation(m_shaderProgram, "H");
     if (location == -1)
     {
@@ -311,7 +304,7 @@ void Painter::draw()
     }
     else
     {
-      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, H);
+      glUniformMatrix3fv(location, 1 /*only setting 1 matrix*/, true /*transpose?*/, (float*)m_H2.data);
     }
 
     // Draw a rectangle from the 2 triangles using 6 indices
