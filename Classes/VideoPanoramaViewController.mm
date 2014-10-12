@@ -60,12 +60,16 @@
     BOOL notSetup;
 	UIBackgroundTaskIdentifier _backgroundRecordingID;
 	BOOL _allowedToUseGPU;
+   BOOL trackLost;
 }
 
 @property(nonatomic, retain) IBOutlet UILabel *framerateLabel;
 @property(nonatomic, retain) IBOutlet UILabel *dimensionsLabel;
+@property(nonatomic, retain) IBOutlet UILabel *indicatorLabel;
+@property(nonatomic, retain) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property(nonatomic, retain) NSTimer *labelTimer;
 @property(nonatomic, retain) GLKView *previewView;
+@property(nonatomic, retain) NSTimer *timer;
 
 @end
 
@@ -131,16 +135,27 @@
     // Keep track of changes to the device orientation so we can update the capture pipeline
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 	
-	_addedObservers = YES;
+   _timer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(checkTracking) userInfo:nil repeats:YES];
+   [_timer fire];
 	
 	// the willEnterForeground and didEnterBackground notifications are subsequently used to update _allowedToUseGPU
 	_allowedToUseGPU = ( [UIApplication sharedApplication].applicationState != UIApplicationStateBackground );
 	self.capturePipeline.renderingEnabled = _allowedToUseGPU;
 	
 [   self.capturePipeline startRunning];
+   trackLost = NO;
+   [self stopAdjusting];
 
    
     [super viewDidLoad];
+}
+
+- (void)checkTracking
+{
+   if ([VideoPanoramaAppDelegate sharedDelegate].getMatcher->trackLost() != trackLost){
+      trackLost = [VideoPanoramaAppDelegate sharedDelegate].getMatcher->trackLost();
+      trackLost ? [self adjusting] : [self stopAdjusting];
+   }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -307,6 +322,17 @@
 	[self showError:error];
 }
 
+-(void) adjusting {
+   [_activityIndicator startAnimating];
+   _activityIndicator.hidden = NO;
+   _indicatorLabel.hidden = NO;
+}
+
+-(void) stopAdjusting{
+   [_activityIndicator stopAnimating];
+   _activityIndicator.hidden = YES;
+   _indicatorLabel.hidden = YES;
+}
 -(void) sendDataToMatcher: (NSData *)data
 {
    cv::Mat jpg(data.length-4*sizeof(float), 1, CV_8UC1, (unsigned char*)data.bytes);
@@ -316,7 +342,7 @@
    
    float floats[7];
    memcpy(floats, &buffer[s-7*sizeof(float)], 7*sizeof(float));
-   std::cout << "---> " << floats[0] << "," << floats[1] << "," << floats[2] << "," << floats[3] << std::endl;
+   //std::cout << "---> " << floats[0] << "," << floats[1] << "," << floats[2] << "," << floats[3] << std::endl;
    //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(floats[0], floats[1], floats[2], floats[3]), cv::Vec3f(floats[4], floats[5], floats[6]), 0);
 }
