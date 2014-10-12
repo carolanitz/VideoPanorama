@@ -132,7 +132,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   // ----------------------------
   // KLT tracker to further improve the result
   // ----------------------------
-  cv::TermCriteria termcrit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.001);
+  cv::TermCriteria termcrit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.03);
   cv::cornerSubPix(imgSrc, ptsSrc, cv::Size(3,3), cv::Size(-1,-1), termcrit);
   cv::cornerSubPix(imgDst, ptsDst, cv::Size(3,3), cv::Size(-1,-1), termcrit);
   if(1)

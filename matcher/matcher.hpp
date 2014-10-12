@@ -30,8 +30,6 @@ private:
 
   Eigen::Quaternionf m_lastOrientation[2];
   Eigen::Quaternionf m_sumOrientation[2];
-  //Eigen::Quaternionf m_oldSumOrientation[2];
-  
   
   cv::Mat m_lastImage[2];
   cv::Mat m_H_1to2;
@@ -44,7 +42,6 @@ private:
   // called from the slow matcher when matching is finished
   void matched1to2(bool, cv::Mat H);
   void matched2to1(bool, cv::Mat H);
-  //void prepareMatch();
   
   //! update homographies based on intermediate orientation data while matcher is running  
   void updateIntermediate();

@@ -73,7 +73,7 @@ void Matcher::updateIntermediate()
   cv::cv2eigen<float,3,3>(m_H_1to2, H);
   
   // we have collected sensor data so far -> 
-   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
+  Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
     
   // move matched poitns even further (based on the sensors)
   H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
@@ -95,23 +95,11 @@ void Matcher::updateIntermediate()
 }
 
 // ----------------------------------------------------------------------------------
-/*void Matcher::prepareMatch()
-{
-  // start collection of gyros, which will be used for intermediate position
-  // update while the matcher is running
-  m_sumOrientation[0] = Eigen::Quaternionf::Identity();
-  m_sumOrientation[1] = Eigen::Quaternionf::Identity();
-}
-*/
-
-// ----------------------------------------------------------------------------------
 void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t timestamp)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   
-   std::cout << rq << std::endl;
   // accumulate orientation
-  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
   Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[0].inverse();
   m_lastOrientation[0] = q;
@@ -147,7 +135,6 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   std::lock_guard<std::mutex> lock(m_mutex);
   
   // accumulate orientation
-  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
   Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[1].inverse();
   m_lastOrientation[1] = q;
@@ -155,8 +142,8 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   {
     m_sumOrientation[1] = dq * m_sumOrientation[1];
   }
-  
   m_lastImage[1] = image;
+  
   using namespace std::placeholders;  // for _1, _2, _3...
 
   if (m_matcherAvalable && !m_lastImage[0].empty()
