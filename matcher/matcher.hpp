@@ -15,8 +15,8 @@ public:
   ~Matcher();
 
   // Set new images
-  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
-  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
+  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, cv::Vec3f gyro, int64_t timestamp);
+  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, cv::Vec3f gyro, int64_t timestamp);
 
   // Set OpenGL images
   void setupOpenGL(int width, int height);

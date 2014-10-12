@@ -8,7 +8,7 @@
 #include <functional>
 #include <iostream>
 
-#define DEBUG_SENSORS
+//#define DEBUG_SENSORS
 
 // ----------------------------------------------------------------------------------
 Matcher::Matcher()
@@ -32,6 +32,8 @@ Matcher::Matcher()
       0, 1081.6440045, 362.19709930,
       0, 0, 1;
   
+   //m_K.block<3,1>(0,2) *= -1;
+   
   m_iK = m_K.inverse();
 }
 
@@ -71,10 +73,12 @@ void Matcher::updateIntermediate()
   cv::cv2eigen<float,3,3>(m_H_1to2, H);
   
   // we have collected sensor data so far -> 
-  Eigen::Quaternionf R = m_sumOrientation[1] * m_sumOrientation[0].inverse();
+   Eigen::Quaternionf R = m_sumOrientation[0];// * m_sumOrientation[0].inverse();
     
   // move matched poitns even further (based on the sensors)
-  H = H * m_K * R.toRotationMatrix() * m_iK;
+  H = m_K
+  // // * utils::makeRotZ3((float)M_PI_2) * utils::makeRotY3((float)M_PI_2) * utils::makeRotX3((float)M_PI_2)
+   * R.toRotationMatrix() * m_iK;
   H /= H(2,2);
   
   float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
@@ -96,6 +100,7 @@ void Matcher::updateIntermediate()
 // ----------------------------------------------------------------------------------
 void Matcher::prepareMatch()
 {
+   return;
   // start collection of gyros, which will be used for intermediate position
   // update while the matcher is running
   m_sumOrientation[0] = Eigen::Quaternionf::Identity();
@@ -103,7 +108,7 @@ void Matcher::prepareMatch()
 }
 
 // ----------------------------------------------------------------------------------
-void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
+void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t timestamp)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   
@@ -140,7 +145,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
 }
 
 // ----------------------------------------------------------------------------------
-void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
+void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t timestamp)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   

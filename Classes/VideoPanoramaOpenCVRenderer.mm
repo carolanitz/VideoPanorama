@@ -104,21 +104,19 @@
    cv::Vec4f motionvector;
    motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
    
+   cv::Vec3f gyro;
+   gyro = cv::Vec3f(motion.rotationRate.x, motion.rotationRate.y,motion.rotationRate.z);
    if (!isSender && isStarted && isReadyForData)
    {
       std::vector<uchar> buffer;
       std::vector<int> params;
       params.push_back(CV_IMWRITE_JPEG_QUALITY);
       params.push_back(20);
-      buffer.resize(4*sizeof(float));
-      cv::vector<int> buffer2;
       cv::imencode(".jpg", bgraImage, buffer, params);
-      buffer.resize(buffer2.size() + 4*sizeof(float));
+      buffer.resize(buffer.size() + 7*sizeof(float));
       
-      ((float*)(&buffer[buffer.size()-4*sizeof(float)]))[0] =motion.attitude.quaternion.x;
-      ((float*)(&buffer[buffer.size()-4*sizeof(float)]))[1] =motion.attitude.quaternion.y;
-      ((float*)(&buffer[buffer.size()-4*sizeof(float)]))[2] =motion.attitude.quaternion.z;
-      ((float*)(&buffer[buffer.size()-4*sizeof(float)]))[3] =motion.attitude.quaternion.w;
+      memcpy(&buffer[buffer.size()-7*sizeof(float)], &motionvector[0], 4*sizeof(float));
+      memcpy(&buffer[buffer.size()-3*sizeof(float)], &gyro[0], 3*sizeof(float));
       
       [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
       isReadyForData = false;

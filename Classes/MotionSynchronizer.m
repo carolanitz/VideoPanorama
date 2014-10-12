@@ -127,7 +127,8 @@ BOOL LOG = YES;
 					NSLog(@"%@", error);
 			};
 			
-			[self.motionManager startDeviceMotionUpdatesToQueue:self.motionQueue withHandler:motionHandler];
+			//[self.motionManager startDeviceMotionUpdatesToQueue:self.motionQueue withHandler:motionHandler];
+         [self.motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryCorrectedZVertical toQueue:self.motionQueue withHandler:motionHandler];
 		}
 	}
 }

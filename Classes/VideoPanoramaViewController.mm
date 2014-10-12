@@ -309,17 +309,16 @@
 
 -(void) sendDataToMatcher: (NSData *)data
 {
-   cv::Mat jpg([data length], 1, CV_8UC1, (unsigned char*)data.bytes);
+   cv::Mat jpg(data.length-4*sizeof(float), 1, CV_8UC1, (unsigned char*)data.bytes);
    cv::Mat image = cv::imdecode(jpg, CV_LOAD_IMAGE_COLOR);
    unsigned char* buffer = (unsigned char*) data.bytes;
    int s = data.length;
-   float x = ((float*)(&buffer[s-4*sizeof(float)]))[0];
-   float y=   ((float*)(&buffer[s-4*sizeof(float)]))[1];
-   float z=   ((float*)(&buffer[s-4*sizeof(float)]))[2];
-   float w=   ((float*)(&buffer[s-4*sizeof(float)]))[3];
-   std::cout << "---> " << x << "," << y << "," << z << "," << w << std::endl;
+   
+   float floats[7];
+   memcpy(floats, &buffer[s-7*sizeof(float)], 7*sizeof(float));
+   std::cout << "---> " << floats[0] << "," << floats[1] << "," << floats[2] << "," << floats[3] << std::endl;
    //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
-   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(x, y, z, w), 0);
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(floats[0], floats[1], floats[2], floats[3]), 0);
 }
 
 @end
