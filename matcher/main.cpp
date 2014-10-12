@@ -69,8 +69,8 @@ void timer(int)
     video1 >> frame1;
   }
     
-  matcher.updateImage1(frame0, orientation0, time0);
-  matcher.updateImage2(frame1, orientation1, time1);
+  matcher.updateImage1(frame0, orientation0, cv::Vec3f(0,0,0), time0);
+  matcher.updateImage2(frame1, orientation1, cv::Vec3f(0,0,0), time1);
 
   glutTimerFunc(refreshMillis, timer, 0); // subsequent timer call at milliseconds
   glutPostRedisplay();
