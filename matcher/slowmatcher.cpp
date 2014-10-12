@@ -58,8 +58,8 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   //cv::GaussianBlur(imageSrc, imgSrc, cv::Size(3,3), 5.0);
   //cv::GaussianBlur(imageDst, imgDst, cv::Size(3,3), 5.0);
 
-  cv::medianBlur(imageSrc, imgSrc, 3);
-  cv::medianBlur(imageDst, imgDst, 3);
+  //cv::medianBlur(imageSrc, imgSrc, 3);
+  //cv::medianBlur(imageDst, imgDst, 3);
   
   cv::Mat descriptorsSrc, descriptorsDst;
   
@@ -139,14 +139,14 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   {
     std::vector<uchar> status;
     std::vector<float> err;
-    cv::Size winSize(5,5);
+    cv::Size winSize(7,7);
     
     std::vector<cv::Point2f> ptsDstKlt = ptsDst;
     std::vector<cv::Point2f> ptsSrcOld = ptsSrc;
     
     std::vector<cv::Mat> pyrSrc, pyrDst;
-    cv::buildOpticalFlowPyramid(imgSrc, pyrSrc, winSize, 5);
-    cv::buildOpticalFlowPyramid(imgDst, pyrDst, winSize, 5);
+    cv::buildOpticalFlowPyramid(imgSrc, pyrSrc, winSize, 4);
+    cv::buildOpticalFlowPyramid(imgDst, pyrDst, winSize, 4);
     
     
     /*cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );
@@ -155,7 +155,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
     cv::imshow("imgae1", img);
     cv::waitKey(0);*/
     
-    cv::calcOpticalFlowPyrLK(pyrSrc, pyrDst, ptsSrc, ptsDstKlt, status, err, winSize, 5, termcrit, cv::OPTFLOW_USE_INITIAL_FLOW);
+    cv::calcOpticalFlowPyrLK(pyrSrc, pyrDst, ptsSrc, ptsDstKlt, status, err, winSize, 4, termcrit, cv::OPTFLOW_USE_INITIAL_FLOW);
     
     // remove bad points
     ptsSrc.clear();
@@ -176,7 +176,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
     return;
   }
   
-  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 2.0);
+  cv::Mat H = cv::findHomography(ptsSrc, ptsDst, CV_RANSAC, 10.);
   H.convertTo(H, CV_32FC1);
   
   if (!niceHomography(H))
@@ -185,7 +185,6 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
       cb(false, priorH);
       return;    
   }
-  
   
   // DEBUG  
   printf("H:\n");
