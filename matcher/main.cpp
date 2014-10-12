@@ -21,7 +21,7 @@ size_t inputIndex[2] = {0,0};
 cv::VideoCapture video0, video1;
 Matcher matcher;
 
-int refreshMillis = 20;      // Refresh period in milliseconds
+int refreshMillis = 33;      // Refresh period in milliseconds
 
 bool setup = false;
 
