@@ -76,8 +76,7 @@ void Matcher::updateIntermediate()
    Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
     
   // move matched poitns even further (based on the sensors)
-  H = m_K
-   * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
+  H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
   H /= H(2,2);
   
   float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
@@ -91,21 +90,19 @@ void Matcher::updateIntermediate()
   cv::eigen2cv<float,3,3>(H, cvH);
   m_H_prior = cvH.inv();
   
-  
   m_painter.updateHomography2(cvH.inv());  
   //m_painter.updateHomography1(cvH.inv());  // one is fixed for now
 }
 
 // ----------------------------------------------------------------------------------
-void Matcher::prepareMatch()
+/*void Matcher::prepareMatch()
 {
   // start collection of gyros, which will be used for intermediate position
   // update while the matcher is running
-   m_oldSumOrientation[0] = m_sumOrientation[0];
-   m_oldSumOrientation[1] = m_sumOrientation[1];
   m_sumOrientation[0] = Eigen::Quaternionf::Identity();
   m_sumOrientation[1] = Eigen::Quaternionf::Identity();
 }
+*/
 
 // ----------------------------------------------------------------------------------
 void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t timestamp)
@@ -130,7 +127,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   if (m_matcherAvalable && !m_lastImage[1].empty())
   {
 #ifndef DEBUG_SENSORS
-    prepareMatch();
+    //prepareMatch();
     m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1], m_H_prior, 
         std::bind(&Matcher::matched1to2, this, _1, _2));
     m_matcherAvalable = false;
@@ -168,7 +165,7 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
     #endif
       )
   {
-    prepareMatch();
+    //prepareMatch();
     m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_H_prior.inv(), 
         std::bind(&Matcher::matched2to1, this, _1, _2));
     m_matcherAvalable = false;
@@ -182,6 +179,33 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
 }
 
 // ----------------------------------------------------------------------------------
+void Matcher::updateAndFixH(cv::Mat cvH)
+{
+  // H matrix as came from the matcher so far
+  Eigen::Matrix3f H;
+  cv::cv2eigen<float,3,3>(cvH, H);
+  
+  // we have collected sensor data so far -> 
+   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
+    
+  // move matched poitns even further (based on the sensors)
+  H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
+  H /= H(2,2);
+  
+  float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  for (int i=0; i < 3; i++)
+    for (int j=0; j < 3; j++)
+      H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
+  
+  m_lastH = H;
+  
+  cv::eigen2cv<float,3,3>(H, m_H_1to2);
+
+  m_sumOrientation[0] = Eigen::Quaternionf::Identity();
+  m_sumOrientation[1] = Eigen::Quaternionf::Identity();
+}
+
+// ----------------------------------------------------------------------------------
 void Matcher::matched1to2(bool valid, cv::Mat H)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -191,16 +215,12 @@ void Matcher::matched1to2(bool valid, cv::Mat H)
   
   if (!valid)
   {
-     m_sumOrientation[0] = m_oldSumOrientation[0];
-     m_sumOrientation[1] = m_oldSumOrientation[1];
-     m_oldSumOrientation[0] = Eigen::Quaternionf::Identity();
-     m_oldSumOrientation[1] = Eigen::Quaternionf::Identity();
-     
+     updateAndFixH(m_H_1to2); // update with old
      return;
   }
   
-  //H = H.inv();
-  H.convertTo(m_H_1to2, CV_32FC1); // float  
+  H.convertTo(m_H_1to2, CV_32FC1);
+  updateAndFixH(m_H_1to2); // update with new
 }
 
 // ----------------------------------------------------------------------------------
@@ -211,18 +231,14 @@ void Matcher::matched2to1(bool valid, cv::Mat H)
   m_matcherAvalable = true;  
   m_tracking = true;
   
-   if (!valid)
-   {
-      m_sumOrientation[0] = m_oldSumOrientation[0];
-      m_sumOrientation[1] = m_oldSumOrientation[1];
-      m_oldSumOrientation[0] = Eigen::Quaternionf::Identity();
-      m_oldSumOrientation[1] = Eigen::Quaternionf::Identity();
-      
-      return;
-   }
+  if (!valid)
+  {
+    updateAndFixH(m_H_1to2); // update with old
+    return;
+  }
 
   H = H.inv();
-  H.convertTo(m_H_1to2, CV_32FC1); // float
-  
+  H.convertTo(m_H_1to2, CV_32FC1);
+  updateAndFixH(m_H_1to2); // update with new  
 }
 
