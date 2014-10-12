@@ -115,7 +115,6 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   if (m_matcherAvalable && !m_lastImage[1].empty())
   {
 #ifndef DEBUG_SENSORS
-    //prepareMatch();
     m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1],  m_trackLost ? cv::Mat::eye(3,3,CV_32FC1) : m_H_prior.inv(), 
         std::bind(&Matcher::matched1to2, this, _1, _2));
     m_matcherAvalable = false;
@@ -126,8 +125,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   {
     updateIntermediate();
   }
-   m_painter.updateImage1(image);
-
+  m_painter.updateImage1(image);
 }
 
 // ----------------------------------------------------------------------------------
@@ -153,7 +151,6 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
     #endif
       )
   {
-    //prepareMatch();
     m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_trackLost ? cv::Mat::eye(3,3,CV_32FC1) : m_H_prior, 
         std::bind(&Matcher::matched2to1, this, _1, _2));
     m_matcherAvalable = false;
@@ -163,7 +160,7 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   {
     updateIntermediate();
   }
-   m_painter.updateImage2(image);
+  m_painter.updateImage2(image);
 }
 
 // ----------------------------------------------------------------------------------
@@ -174,19 +171,12 @@ void Matcher::updateAndFixH(cv::Mat cvH)
   cv::cv2eigen<float,3,3>(cvH, H);
   
   // we have collected sensor data so far -> 
-   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
+  Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
     
   // move matched poitns even further (based on the sensors)
   H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
   H /= H(2,2);
-  
-  /*float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
-  for (int i=0; i < 3; i++)
-    for (int j=0; j < 3; j++)
-      H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
-  
-  m_lastH = H;*/
-  
+
   cv::eigen2cv<float,3,3>(H, m_H_1to2);
 
   m_sumOrientation[0] = Eigen::Quaternionf::Identity();
