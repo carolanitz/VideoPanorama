@@ -51,6 +51,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "VideoPanoramaAppDelegate.h"
 #include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
 @interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate, GLKViewDelegate>
 {
