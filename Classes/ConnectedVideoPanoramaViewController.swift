@@ -11,18 +11,19 @@ import MultipeerConnectivity
 import CoreMedia
 
 class ConnectedVideoPanoramaViewController: VideoPanoramaViewController, MCAdvertiserAssistantDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate {
-    
-    let serviceType = "VideoPanorama"
-    var peerID: MCPeerID
-    var advertiser: MCAdvertiserAssistant
-    
-    required init(coder aDecoder: NSCoder) {
-        peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
-        networkSession = MCSession(peer: peerID)
-        advertiser = MCAdvertiserAssistant(serviceType: serviceType, discoveryInfo: nil, session: networkSession)
-        super.init(coder: aDecoder)
+   
+   let serviceType = "VideoPanorama"
+   var peerID: MCPeerID
+   var advertiser: MCAdvertiserAssistant
+   
+   required init(coder aDecoder: NSCoder) {
+      peerID = MCPeerID(displayName: UIDevice.currentDevice().name)
+      networkSession = MCSession(peer: peerID)
+      advertiser = MCAdvertiserAssistant(serviceType: serviceType, discoveryInfo: nil, session: networkSession)
+      super.init(coder: aDecoder)
     }
-    
+   
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         networkSession.delegate = self

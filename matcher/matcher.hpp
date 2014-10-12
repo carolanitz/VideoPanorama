@@ -22,6 +22,8 @@ public:
   void setupOpenGL(int width, int height);
   void draw();
   void cleanupOpenGL();
+   
+   bool trackLost(){ return m_trackLost;}
 
 private:
   Painter m_painter;
