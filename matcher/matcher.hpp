@@ -52,6 +52,7 @@ private:
   
   bool m_tracking;
   bool m_matcherAvalable;
+  bool m_trackLost;
 };
 
 

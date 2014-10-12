@@ -79,7 +79,7 @@ void Matcher::updateIntermediate()
   H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
   H /= H(2,2);
   
-  float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  float a = 0.3; // totally incorrect (linearly interpolating H matrix, ha ha ha)
   for (int i=0; i < 3; i++)
     for (int j=0; j < 3; j++)
       H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
@@ -128,7 +128,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   {
 #ifndef DEBUG_SENSORS
     //prepareMatch();
-    m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1], m_H_prior, 
+    m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1],  m_trackLost ? cv::Mat::eye(3,3,CV_32FC1) : m_H_prior.inv(), 
         std::bind(&Matcher::matched1to2, this, _1, _2));
     m_matcherAvalable = false;
 #endif
@@ -167,7 +167,7 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
       )
   {
     //prepareMatch();
-    m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_H_prior.inv(), 
+    m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_trackLost ? cv::Mat::eye(3,3,CV_32FC1) : m_H_prior, 
         std::bind(&Matcher::matched2to1, this, _1, _2));
     m_matcherAvalable = false;
   }
@@ -193,12 +193,12 @@ void Matcher::updateAndFixH(cv::Mat cvH)
   H = m_K * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
   H /= H(2,2);
   
-  float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  /*float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
   for (int i=0; i < 3; i++)
     for (int j=0; j < 3; j++)
       H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
   
-  m_lastH = H;
+  m_lastH = H;*/
   
   cv::eigen2cv<float,3,3>(H, m_H_1to2);
 
@@ -216,10 +216,12 @@ void Matcher::matched1to2(bool valid, cv::Mat H)
   
   if (!valid)
   {
-     updateAndFixH(m_H_1to2); // update with old
-     return;
+    m_trackLost = true;
+    updateAndFixH(m_H_1to2); // update with old
+    return;
   }
   
+  m_trackLost = false;
   H.convertTo(m_H_1to2, CV_32FC1);
   updateAndFixH(m_H_1to2); // update with new
 }
@@ -234,10 +236,12 @@ void Matcher::matched2to1(bool valid, cv::Mat H)
   
   if (!valid)
   {
+    m_trackLost = true;
     updateAndFixH(m_H_1to2); // update with old
     return;
   }
 
+  m_trackLost = false;
   H = H.inv();
   H.convertTo(m_H_1to2, CV_32FC1);
   updateAndFixH(m_H_1to2); // update with new  
