@@ -50,6 +50,8 @@
 #import <GLKit/GLKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "VideoPanoramaAppDelegate.h"
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
 @interface VideoPanoramaViewController () <VideoPanoramaCapturePipelineDelegate, GLKViewDelegate>
 {
@@ -135,6 +137,9 @@
 	_allowedToUseGPU = ( [UIApplication sharedApplication].applicationState != UIApplicationStateBackground );
 	self.capturePipeline.renderingEnabled = _allowedToUseGPU;
 	
+[   self.capturePipeline startRunning];
+
+   
     [super viewDidLoad];
 }
 
@@ -154,7 +159,7 @@
 	[self.labelTimer invalidate];
 	self.labelTimer = nil;
 	
-	[self.capturePipeline stopRunning];
+	//[self.capturePipeline stopRunning];
 }
 
 - (NSUInteger)supportedInterfaceOrientations
@@ -300,6 +305,20 @@
 {
 	[self recordingStopped];
 	[self showError:error];
+}
+
+-(void) sendDataToMatcher: (NSData *)data
+{
+   cv::Mat jpg(data.length-4*sizeof(float), 1, CV_8UC1, (unsigned char*)data.bytes);
+   cv::Mat image = cv::imdecode(jpg, CV_LOAD_IMAGE_COLOR);
+   unsigned char* buffer = (unsigned char*) data.bytes;
+   int s = data.length;
+   
+   float floats[7];
+   memcpy(floats, &buffer[s-7*sizeof(float)], 7*sizeof(float));
+   std::cout << "---> " << floats[0] << "," << floats[1] << "," << floats[2] << "," << floats[3] << std::endl;
+   //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(floats[0], floats[1], floats[2], floats[3]), cv::Vec3f(floats[4], floats[5], floats[6]), 0);
 }
 
 @end

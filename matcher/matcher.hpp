@@ -6,7 +6,6 @@
 #include <Eigen/Geometry>
 
 #include "painter.hpp"
-#include "fastmatcher.hpp"
 #include "slowmatcher.hpp"
 
 class Matcher {
@@ -16,8 +15,8 @@ public:
   ~Matcher();
 
   // Set new images
-  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
-  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, int64_t timestamp);
+  void updateImage1(cv::Mat image, cv::Vec4f orientationQuaternion, cv::Vec3f gyro, int64_t timestamp);
+  void updateImage2(cv::Mat image, cv::Vec4f orientationQuaternion, cv::Vec3f gyro, int64_t timestamp);
 
   // Set OpenGL images
   void setupOpenGL(int width, int height);
@@ -31,6 +30,7 @@ private:
 
   Eigen::Quaternionf m_lastOrientation[2];
   Eigen::Quaternionf m_sumOrientation[2];
+  //Eigen::Quaternionf m_oldSumOrientation[2];
   
   
   cv::Mat m_lastImage[2];
@@ -44,13 +44,15 @@ private:
   // called from the slow matcher when matching is finished
   void matched1to2(bool, cv::Mat H);
   void matched2to1(bool, cv::Mat H);
-  void prepareMatch();
+  //void prepareMatch();
   
   //! update homographies based on intermediate orientation data while matcher is running  
   void updateIntermediate();
+  void updateAndFixH(cv::Mat H);
   
   bool m_tracking;
   bool m_matcherAvalable;
+  bool m_trackLost;
 };
 
 

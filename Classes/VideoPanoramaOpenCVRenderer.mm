@@ -46,6 +46,7 @@
  
  */
 
+#include <opencv2/highgui/highgui.hpp>
 #import "VideoPanoramaOpenCVRenderer.h"
 
 // To build OpenCV into the project:
@@ -54,6 +55,7 @@
 //	- Make sure framework is included under the target's Build Phases -> Link Binary With Libraries.
 #import <opencv2/opencv.hpp>
 #import "VideoPanoramaAppDelegate.h"
+#import "Globals.h"
 
 @implementation VideoPanoramaOpenCVRenderer{
 
@@ -98,14 +100,31 @@
 	
 	// Use extendedWidth instead of width to account for possible row extensions (sometimes used for memory alignment).
 	// We only need to work on columms from [0, width - 1] regardless.
-	
-	cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
-    cv::Vec4f motionvector;
-    motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
-    NSLog(@"%f, %f, %f", motion.attitude.quaternion.x,motion.attitude.quaternion.y,motion.attitude.quaternion.z);
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, 0);
-    [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(bgraImage.clone(), cv::Vec4f(), 0);
+   cv::Mat bgraImage = cv::Mat( (int)height, (int)extendedWidth, CV_8UC4, base );
+   cv::Vec4f motionvector;
+   motionvector = cv::Vec4f(motion.attitude.quaternion.x, motion.attitude.quaternion.y,motion.attitude.quaternion.z,motion.attitude.quaternion.w);
+   
+   cv::Vec3f gyro;
+   gyro = cv::Vec3f(motion.rotationRate.x, motion.rotationRate.y,motion.rotationRate.z);
+   if (!isSender && isStarted && isReadyForData)
+   {
+      std::vector<uchar> buffer;
+      std::vector<int> params;
+      params.push_back(CV_IMWRITE_JPEG_QUALITY);
+      params.push_back(20);
+      cv::imencode(".jpg", bgraImage, buffer, params);
+      buffer.resize(buffer.size() + 7*sizeof(float));
+      
+      memcpy(&buffer[buffer.size()-7*sizeof(float)], &motionvector[0], 4*sizeof(float));
+      memcpy(&buffer[buffer.size()-3*sizeof(float)], &gyro[0], 3*sizeof(float));
+      
+      [networkSession sendData:[NSData dataWithBytes:&buffer[0] length:buffer.size()] toPeers:[networkSession connectedPeers] withMode:MCSessionSendDataReliable error:nil];
+      isReadyForData = false;
+   }
 
+   
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, cv::Vec3f(0,0,0),  0);
+   
 
 	CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
 	

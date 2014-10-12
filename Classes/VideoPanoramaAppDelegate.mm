@@ -47,6 +47,10 @@
  */
 
 #import "VideoPanoramaAppDelegate.h"
+#import "Globals.h"
+
+BOOL isSender;
+MCSession *networkSession;
 
 @implementation VideoPanoramaAppDelegate
 
