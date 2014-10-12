@@ -318,7 +318,7 @@
    memcpy(floats, &buffer[s-7*sizeof(float)], 7*sizeof(float));
    std::cout << "---> " << floats[0] << "," << floats[1] << "," << floats[2] << "," << floats[3] << std::endl;
    //cv::Mat image = cv::Mat(cv::Size(1280, 720), CV_8UC4, (unsigned char*)data.bytes).clone();
-   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(floats[0], floats[1], floats[2], floats[3]), 0);
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage2(image, cv::Vec4f(floats[0], floats[1], floats[2], floats[3]), cv::Vec3f(floats[4], floats[5], floats[6]), 0);
 }
 
 @end

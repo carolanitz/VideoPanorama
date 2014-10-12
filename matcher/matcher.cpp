@@ -73,11 +73,10 @@ void Matcher::updateIntermediate()
   cv::cv2eigen<float,3,3>(m_H_1to2, H);
   
   // we have collected sensor data so far -> 
-   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[0].inverse();
+   Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].inverse();
     
   // move matched poitns even further (based on the sensors)
   H = m_K
-  // // * utils::makeRotZ3((float)M_PI_2) * utils::makeRotY3((float)M_PI_2) * utils::makeRotX3((float)M_PI_2)
    * utils::makeRotX3((float)M_PI_2) * R.toRotationMatrix() * utils::makeRotX3(-(float)M_PI_2) * m_iK * H;
   H /= H(2,2);
   
@@ -100,9 +99,10 @@ void Matcher::updateIntermediate()
 // ----------------------------------------------------------------------------------
 void Matcher::prepareMatch()
 {
-   return;
   // start collection of gyros, which will be used for intermediate position
   // update while the matcher is running
+   m_oldSumOrientation[0] = m_sumOrientation[0];
+   m_oldSumOrientation[1] = m_sumOrientation[1];
   m_sumOrientation[0] = Eigen::Quaternionf::Identity();
   m_sumOrientation[1] = Eigen::Quaternionf::Identity();
 }
@@ -189,7 +189,15 @@ void Matcher::matched1to2(bool valid, cv::Mat H)
   m_matcherAvalable = true;  
   m_tracking = true;
   
-  if (!valid) return;
+  if (!valid)
+  {
+     m_sumOrientation[0] = m_oldSumOrientation[0];
+     m_sumOrientation[1] = m_oldSumOrientation[1];
+     m_oldSumOrientation[0] = Eigen::Quaternionf::Identity();
+     m_oldSumOrientation[1] = Eigen::Quaternionf::Identity();
+     
+     return;
+  }
   
   //H = H.inv();
   H.convertTo(m_H_1to2, CV_32FC1); // float  
@@ -203,7 +211,15 @@ void Matcher::matched2to1(bool valid, cv::Mat H)
   m_matcherAvalable = true;  
   m_tracking = true;
   
-  if (!valid) return;
+   if (!valid)
+   {
+      m_sumOrientation[0] = m_oldSumOrientation[0];
+      m_sumOrientation[1] = m_oldSumOrientation[1];
+      m_oldSumOrientation[0] = Eigen::Quaternionf::Identity();
+      m_oldSumOrientation[1] = Eigen::Quaternionf::Identity();
+      
+      return;
+   }
 
   H = H.inv();
   H.convertTo(m_H_1to2, CV_32FC1); // float

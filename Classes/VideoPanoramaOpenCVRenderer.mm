@@ -123,7 +123,7 @@
    }
 
    
-      [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, 0);
+   [VideoPanoramaAppDelegate sharedDelegate].getMatcher->updateImage1(bgraImage.clone(), motionvector, cv::Vec3f(0,0,0),  0);
    
 
 	CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );

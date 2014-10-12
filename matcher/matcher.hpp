@@ -30,6 +30,7 @@ private:
 
   Eigen::Quaternionf m_lastOrientation[2];
   Eigen::Quaternionf m_sumOrientation[2];
+  Eigen::Quaternionf m_oldSumOrientation[2];
   
   
   cv::Mat m_lastImage[2];

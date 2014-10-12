@@ -57,8 +57,8 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::Mat imgSrc = imageSrc, imgDst = imageDst;
   //cv::GaussianBlur(imageSrc, imgSrc, cv::Size(3,3), 5.0);
   //cv::GaussianBlur(imageDst, imgDst, cv::Size(3,3), 5.0);
-  
-  //cv::medianBlur(imageSrc, imgSrc, 3);
+
+   //cv::medianBlur(imageSrc, imgSrc, 3);
   //cv::medianBlur(imageDst, imgDst, 3);
   
   cv::Mat descriptorsSrc, descriptorsDst;
@@ -132,14 +132,14 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   // ----------------------------
   // KLT tracker to further improve the result
   // ----------------------------
-  cv::TermCriteria termcrit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.001);
+  cv::TermCriteria termcrit(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.001);
   cv::cornerSubPix(imgSrc, ptsSrc, cv::Size(3,3), cv::Size(-1,-1), termcrit);
   cv::cornerSubPix(imgDst, ptsDst, cv::Size(3,3), cv::Size(-1,-1), termcrit);
   if(1)
   {
     std::vector<uchar> status;
     std::vector<float> err;
-    cv::Size winSize(9,9);
+    cv::Size winSize(5,5);
     
     std::vector<cv::Point2f> ptsDstKlt = ptsDst;
     std::vector<cv::Point2f> ptsSrcOld = ptsSrc;
