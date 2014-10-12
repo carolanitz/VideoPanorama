@@ -34,6 +34,8 @@ private:
   
   cv::Mat m_lastImage[2];
   cv::Mat m_H_1to2;
+  cv::Mat m_H_prior;
+  
   Eigen::Matrix3f m_K;
   Eigen::Matrix3f m_iK;
   Eigen::Matrix3f m_lastH;
