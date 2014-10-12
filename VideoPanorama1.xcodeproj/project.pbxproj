@@ -220,6 +220,7 @@
 				8252DB3719E937DE00403DCB /* Connectivity */,
 				6F90DDEB1395CAAA00125BDA /* VideoPanoramaViewController.h */,
 				6F90DDED1395CAAA00125BDA /* VideoPanoramaViewController.mm */,
+				8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */,
 				31A7A18719E9A63700C95195 /* Globals.h */,
 				6F90DE0E1395CD9C00125BDA /* VideoPanoramaCapturePipeline.h */,
 				6F90DE0F1395CD9C00125BDA /* VideoPanoramaCapturePipeline.m */,
@@ -269,7 +270,6 @@
 		8252DB3719E937DE00403DCB /* Connectivity */ = {
 			isa = PBXGroup;
 			children = (
-				8252DB3F19E93AC000403DCB /* ConnectedVideoPanoramaViewController.swift */,
 			);
 			name = Connectivity;
 			sourceTree = "<group>";
