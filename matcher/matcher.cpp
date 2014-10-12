@@ -16,6 +16,7 @@ Matcher::Matcher()
     , m_matcherAvalable(true)
 {
   m_H_1to2 = cv::Mat::eye(3,3,CV_32FC1);
+  m_H_prior = cv::Mat::eye(3,3,CV_32FC1);
   
   m_painter.updateHomography1(m_H_1to2);
   m_painter.updateHomography2(m_H_1to2);
@@ -70,23 +71,25 @@ void Matcher::updateIntermediate()
   cv::cv2eigen<float,3,3>(m_H_1to2, H);
   
   // we have collected sensor data so far -> 
-  Eigen::Quaternionf R = m_sumOrientation[0] * m_sumOrientation[1].conjugate();
-  
+  Eigen::Quaternionf R = m_sumOrientation[1] * m_sumOrientation[0].conjugate();
+    
   // move matched poitns even further (based on the sensors)
   H = H * m_K * R.toRotationMatrix() * m_iK;
   H /= H(2,2);
   
-  float a = 0.3; // totally incorrect (linearly interpolating H matrix, ha ha ha)
+  float a = 0.5; // totally incorrect (linearly interpolating H matrix, ha ha ha)
   for (int i=0; i < 3; i++)
     for (int j=0; j < 3; j++)
       H(i,j) = H(i,j) * a + m_lastH(i,j) * (1.0 - a);
   
   m_lastH = H;
-  
+    
   cv::Mat cvH;
   cv::eigen2cv<float,3,3>(H, cvH);
+  m_H_prior = cvH.inv();
   
-  m_painter.updateHomography2(cvH);  
+  
+  m_painter.updateHomography2(cvH.inv());  
   //m_painter.updateHomography1(cvH.inv());  // one is fixed for now
 }
 
@@ -105,8 +108,8 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   std::lock_guard<std::mutex> lock(m_mutex);
   
   // accumulate orientation
-  Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
-  //Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
+  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
+  Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[0].conjugate();
   m_lastOrientation[0] = q;
   if (!m_lastImage[0].empty())
@@ -122,7 +125,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   {
 #ifndef DEBUG_SENSORS
     prepareMatch();
-    m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1], m_H_1to2, 
+    m_qualityMatcher.matchImagesAsync(m_lastImage[0], m_lastImage[1], m_H_prior, 
         std::bind(&Matcher::matched1to2, this, _1, _2));
     m_matcherAvalable = false;
 #endif
@@ -141,8 +144,8 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   std::lock_guard<std::mutex> lock(m_mutex);
   
   // accumulate orientation
-  Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
-  //Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
+  //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
+  Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
   Eigen::Quaternionf dq = q * m_lastOrientation[1].conjugate();
   m_lastOrientation[1] = q;
   if (!m_lastImage[1].empty())
@@ -160,7 +163,7 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
       )
   {
     prepareMatch();
-    m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_H_1to2.inv(), 
+    m_qualityMatcher.matchImagesAsync(m_lastImage[1], m_lastImage[0], m_H_prior.inv(), 
         std::bind(&Matcher::matched2to1, this, _1, _2));
     m_matcherAvalable = false;
   }
@@ -182,7 +185,7 @@ void Matcher::matched1to2(bool valid, cv::Mat H)
   
   if (!valid) return;
   
-  H = H.inv();
+  //H = H.inv();
   H.convertTo(m_H_1to2, CV_32FC1); // float  
 }
 
@@ -196,6 +199,7 @@ void Matcher::matched2to1(bool valid, cv::Mat H)
   
   if (!valid) return;
 
+  H = H.inv();
   H.convertTo(m_H_1to2, CV_32FC1); // float
   
 }
