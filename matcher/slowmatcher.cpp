@@ -58,8 +58,8 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   //cv::GaussianBlur(imageSrc, imgSrc, cv::Size(3,3), 5.0);
   //cv::GaussianBlur(imageDst, imgDst, cv::Size(3,3), 5.0);
 
-   //cv::medianBlur(imageSrc, imgSrc, 3);
-  //cv::medianBlur(imageDst, imgDst, 3);
+  cv::medianBlur(imageSrc, imgSrc, 3);
+  cv::medianBlur(imageDst, imgDst, 3);
   
   cv::Mat descriptorsSrc, descriptorsDst;
   
@@ -74,14 +74,14 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   cv::FAST(imgDst, featuresDst, 50, cv::FastFeatureDetector::TYPE_9_16);
     
   printf("input %d vs %d\n", (int)featuresSrc.size(), (int)featuresDst.size());
-  //cv::Ptr<cv::DescriptorExtractor> descriptor = cv::DescriptorExtractor::create("BRIESK" );
-  //descriptor->compute(imgSrc, featuresSrc, descriptorsSrc);
-  //descriptor->compute(imgDst, featuresDst, descriptorsDst);
+  cv::Ptr<cv::DescriptorExtractor> descriptor = cv::DescriptorExtractor::create("ORB" );
+  descriptor->compute(imgSrc, featuresSrc, descriptorsSrc);
+  descriptor->compute(imgDst, featuresDst, descriptorsDst);
   
   // descriptors
-  cv::BriefDescriptorExtractor brief;
-  brief.compute(imgSrc, featuresSrc, descriptorsSrc);  
-  brief.compute(imgDst, featuresDst, descriptorsDst);
+  //cv::BriefDescriptorExtractor descriptor;
+  //descriptor.compute(imgSrc, featuresSrc, descriptorsSrc);  
+  //descriptor.compute(imgDst, featuresDst, descriptorsDst);
   
   if (featuresDst.size() < 10 || featuresSrc.size() < 10
       || descriptorsSrc.rows != featuresSrc.size()
@@ -101,7 +101,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   std::vector<cv::Point2f> ptsSrc, ptsDst;
   for( int i = 0; i < matches.size(); i++ )
   {
-    if( matches[i].distance <= 10)//std::max(4. * min_dist, 0.02) )
+    if( matches[i].distance <= 20)//std::max(4. * min_dist, 0.02) )
     {
       goodMatches.push_back(matches[i]);
     }
@@ -186,7 +186,7 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
       return;    
   }
   
-  /*
+  
   // DEBUG  
   printf("H:\n");
   for (int i=0; i < 3; i++)
@@ -195,14 +195,18 @@ void QualityMatcher::doTheMagic(cv::Mat imageSrc, cv::Mat imageDst, cv::Mat prio
   for (int i=0; i < 3; i++)
     printf("%f %f %f\n", priorH.at<float>(i,0), priorH.at<float>(i,1), priorH.at<float>(i,2));
   
-  
-  float nrm = cv::norm(priorH, H);
-  //if (nrm > 1.0)
+  float nrm = cv::norm(priorH);
+  if (nrm > 2)
   {
-    printf("(H-prior).norm() = %f ignore", nrm);
-    //cb(false, priorH);
-    //return;    
-  }*/
+    nrm = cv::norm(priorH, H);
+    printf("(H-prior).norm() = %f\n", nrm);
+    if (nrm > 10.0)
+    {
+      printf("MATCH FAILED - bad H\n");
+      cb(false, priorH);
+      return;    
+    }
+  }
   
   cb(true, H);
   
@@ -225,5 +229,5 @@ void QualityMatcher::matchImagesAsync(cv::Mat imageSrc, cv::Mat imageDst, cv::Ma
   cv::split(imageSrc, rgbSrc);
   cv::split(imageDst, rgbDst);
     
-  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, rgbSrc[1], rgbDst[1], priorH, cb)));
+  m_matchingThread.reset(new std::thread(std::bind(&QualityMatcher::doTheMagic, this, rgbSrc[1], rgbDst[1], priorH.clone(), cb)));
 }
