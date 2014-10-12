@@ -71,7 +71,7 @@ void Matcher::updateIntermediate()
   cv::cv2eigen<float,3,3>(m_H_1to2, H);
   
   // we have collected sensor data so far -> 
-  Eigen::Quaternionf R = m_sumOrientation[1] * m_sumOrientation[0].conjugate();
+  Eigen::Quaternionf R = m_sumOrientation[1] * m_sumOrientation[0].inverse();
     
   // move matched poitns even further (based on the sensors)
   H = H * m_K * R.toRotationMatrix() * m_iK;
@@ -110,7 +110,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   // accumulate orientation
   //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
   Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
-  Eigen::Quaternionf dq = q * m_lastOrientation[0].conjugate();
+  Eigen::Quaternionf dq = q * m_lastOrientation[0].inverse();
   m_lastOrientation[0] = q;
   if (!m_lastImage[0].empty())
   {
@@ -146,7 +146,7 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
   // accumulate orientation
   //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
   Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
-  Eigen::Quaternionf dq = q * m_lastOrientation[1].conjugate();
+  Eigen::Quaternionf dq = q * m_lastOrientation[1].inverse();
   m_lastOrientation[1] = q;
   if (!m_lastImage[1].empty())
   {
