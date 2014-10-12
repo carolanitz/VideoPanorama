@@ -282,6 +282,7 @@ typedef NS_ENUM( NSInteger, VideoPanoramaRecordingStatus )
 		[_captureSession addOutput:videoOut];
 	}
 	_videoConnection = [videoOut connectionWithMediaType:AVMediaTypeVideo];
+   _videoConnection.enablesVideoStabilizationWhenAvailable = true;
 		
 	int frameRate;
 	NSString *sessionPreset = AVCaptureSessionPresetHigh;
