@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6246" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="nkh-mc-Ppc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="nkh-mc-Ppc">
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6239"/>
+        <deployment defaultVersion="1792" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -21,40 +21,24 @@
             </objects>
             <point key="canvasLocation" x="-397" y="-50"/>
         </scene>
-        <!--VideoPanorama-->
+        <!--Videorama-->
         <scene sceneID="oFs-Qv-g6U">
             <objects>
                 <viewController id="t7Y-jQ-554" customClass="ConnectedVideoPanoramaViewController" customModule="VideoPanorama" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="6i6-CY-hgq">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- FPS" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HDX-o9-NoD">
-                                <rect key="frame" x="100" y="20" width="200" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="- x -" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="eqF-fh-KLd">
-                                <rect key="frame" x="100" y="49" width="200" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
-                    <navigationItem key="navigationItem" title="VideoPanorama" id="KRh-eK-cWt">
-                        <barButtonItem key="leftBarButtonItem" title="Connect" id="RA1-IV-6XC">
+                    <navigationItem key="navigationItem" title="Videorama" id="KRh-eK-cWt">
+                        <barButtonItem key="leftBarButtonItem" title="Search" id="RA1-IV-6XC">
                             <color key="tintColor" red="1" green="0.73974886120000005" blue="0.38491074759999999" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <action selector="connect" destination="t7Y-jQ-554" id="aed-2a-X7b"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Send" style="plain" id="PlD-2E-KkV">
+                        <barButtonItem key="rightBarButtonItem" title="Magic" style="plain" id="PlD-2E-KkV">
                             <color key="tintColor" red="1" green="0.73974886120000005" blue="0.38491074759999999" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <action selector="send" destination="t7Y-jQ-554" id="MZN-QP-DNr"/>
@@ -62,8 +46,6 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="dimensionsLabel" destination="eqF-fh-KLd" id="afD-Fh-0ot"/>
-                        <outlet property="framerateLabel" destination="HDX-o9-NoD" id="edU-6K-7CE"/>
                         <outlet property="view" destination="6i6-CY-hgq" id="59k-xW-dZr"/>
                     </connections>
                 </viewController>
