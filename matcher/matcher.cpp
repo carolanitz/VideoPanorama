@@ -137,8 +137,9 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   if (m_tracking)
   {
     updateIntermediate();
-    m_painter.updateImage1(image);
   }
+   m_painter.updateImage1(image);
+
 }
 
 // ----------------------------------------------------------------------------------
@@ -174,8 +175,8 @@ void Matcher::updateImage2(cv::Mat image, cv::Vec4f rq, cv::Vec3f g, int64_t tim
   if (m_tracking)
   {
     updateIntermediate();
-    m_painter.updateImage2(image);
   }
+   m_painter.updateImage2(image);
 }
 
 // ----------------------------------------------------------------------------------
