@@ -8,7 +8,7 @@
 #include <functional>
 #include <iostream>
 
-//#define DEBUG_SENSORS
+#define DEBUG_SENSORS
 
 // ----------------------------------------------------------------------------------
 Matcher::Matcher()
@@ -107,6 +107,7 @@ void Matcher::updateImage1(cv::Mat image, cv::Vec4f rq, int64_t timestamp)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   
+   std::cout << rq << std::endl;
   // accumulate orientation
   //Eigen::Quaternionf q(rq[3],rq[1],rq[2],rq[0]); // iOS sensors
   Eigen::Quaternionf q(rq[3],rq[0],rq[1],rq[2]);
